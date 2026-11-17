@@ -15,7 +15,11 @@ import { authClient } from "@/lib/auth-client"
 import { getUserInitials } from "@/lib/format"
 import { uploadToImgbb } from "@/lib/imgbb"
 import { dashboardPathForRole, type SignupRole } from "@/lib/roles"
-import { validateEmail, validatePassword, validateRequired } from "@/lib/validation"
+import {
+  validateEmail,
+  validatePassword,
+  validateRequired,
+} from "@/lib/validation"
 import { cn } from "@/lib/utils"
 
 const ROLE_OPTIONS: {
@@ -69,7 +73,8 @@ export function SignUpForm() {
   }, [])
 
   const passwordHint = useMemo(() => {
-    if (password === "") return "Min 6 characters with one uppercase and one lowercase letter."
+    if (password === "")
+      return "Min 6 characters with one uppercase and one lowercase letter."
     return undefined
   }, [password])
 
@@ -175,18 +180,18 @@ export function SignUpForm() {
                 onClick={() => setRole(option.value)}
                 aria-pressed={active}
                 className={cn(
-                  "rounded-xl border p-3 text-left transition-all outline-none focus-visible:ring-3 focus-visible:ring-ring/50",
+                  "rounded-xl border bg-white/70 p-3 text-left transition-all outline-none focus-visible:ring-3 focus-visible:ring-ring/50 dark:bg-input/20",
                   active
-                    ? "border-champagne-500 bg-champagne-500/10 ring-1 ring-champagne-500/50"
-                    : "bg-card hover:border-champagne-500/40"
+                    ? "border-[#B76E79] bg-rose-50/80 ring-1 ring-[#B76E79]/60 dark:bg-input/40"
+                    : "border-rose-200/80 hover:border-[#B76E79]/50 dark:border-input"
                 )}
               >
                 <span
                   className={cn(
-                    "flex size-8 items-center justify-center rounded-lg",
+                    "flex size-8 items-center justify-center rounded-lg transition-colors",
                     active
-                      ? "bg-champagne-500 text-white"
-                      : "bg-muted text-muted-foreground"
+                      ? "bg-[#B76E79] text-white"
+                      : "bg-rose-100/80 text-[#9c6470] dark:bg-input/40 dark:text-muted-foreground"
                   )}
                 >
                   <option.icon className="size-4" />
@@ -228,7 +233,9 @@ export function SignUpForm() {
         <div className="space-y-1.5">
           <Label htmlFor="businessName">
             Business name{" "}
-            <span className="font-normal text-muted-foreground">(optional)</span>
+            <span className="font-normal text-muted-foreground">
+              (optional)
+            </span>
           </Label>
           <div className="relative">
             <Store className="pointer-events-none absolute top-1/2 left-3 size-4 -translate-y-1/2 text-muted-foreground" />
@@ -283,7 +290,9 @@ export function SignUpForm() {
         </Label>
         <div className="flex items-center gap-3">
           <Avatar className="size-11">
-            {previewUrl ? <AvatarImage src={previewUrl} alt="Profile preview" /> : null}
+            {previewUrl ? (
+              <AvatarImage src={previewUrl} alt="Profile preview" />
+            ) : null}
             <AvatarFallback className="bg-champagne-500/15 text-champagne-700">
               {getUserInitials(fullName || undefined)}
             </AvatarFallback>
@@ -291,7 +300,7 @@ export function SignUpForm() {
           <div className="min-w-0 flex-1">
             <label
               htmlFor="profileImage"
-              className="inline-flex h-9 cursor-pointer items-center gap-2 rounded-lg border border-input bg-background px-3 text-sm font-medium text-foreground transition-colors hover:bg-muted"
+              className="inline-flex h-9 cursor-pointer items-center gap-2 rounded-lg border border-rose-200/90 bg-white/70 px-3 text-sm font-medium text-foreground transition-colors hover:bg-rose-50/70 dark:border-input dark:bg-input/30 dark:hover:bg-input/50"
             >
               <ImagePlus className="size-4" />
               {imageFile ? "Change image" : "Upload photo"}
@@ -322,18 +331,20 @@ export function SignUpForm() {
         </div>
       </div>
 
-      <Button type="submit" disabled={submitting} className="h-10 w-full gap-2">
-        {submitting ? (
-          <LoaderCircle className="size-4 animate-spin" />
-        ) : null}
+      <Button
+        type="submit"
+        disabled={submitting}
+        className="h-10 w-full gap-2 bg-[#B76E79] text-[#fffdf8] hover:bg-[#a25a64]"
+      >
+        {submitting ? <LoaderCircle className="size-4 animate-spin" /> : null}
         {submitting ? "Creating account…" : "Create Account"}
       </Button>
 
-      <p className="text-center text-sm text-muted-foreground">
+      <p className="text-center text-sm text-stone-600 dark:text-muted-foreground">
         Already have an account?{" "}
         <Link
           href="/sign-in"
-          className="font-medium text-champagne-700 underline-offset-4 hover:underline"
+          className="font-medium text-[#B76E79] underline-offset-4 hover:underline"
         >
           Sign in
         </Link>

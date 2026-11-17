@@ -95,7 +95,11 @@ export function SignInForm() {
         autoComplete="current-password"
       />
 
-      <Button type="submit" disabled={submitting} className="h-10 w-full gap-2">
+      <Button
+        type="submit"
+        disabled={submitting}
+        className="h-10 w-full gap-2 bg-[#B76E79] text-[#fffdf8] hover:bg-[#a25a64]"
+      >
         {submitting ? (
           <LoaderCircle className="size-4 animate-spin" />
         ) : (
@@ -105,9 +109,11 @@ export function SignInForm() {
       </Button>
 
       <div className="flex items-center gap-3">
-        <span className="h-px flex-1 bg-border" />
-        <span className="text-xs text-muted-foreground">or</span>
-        <span className="h-px flex-1 bg-border" />
+        <span className="h-px flex-1 bg-rose-200/80" />
+        <span className="text-xs text-stone-500 dark:text-muted-foreground">
+          or
+        </span>
+        <span className="h-px flex-1 bg-rose-200/80" />
       </div>
 
       <Button
@@ -115,17 +121,17 @@ export function SignInForm() {
         variant="outline"
         onClick={handleGoogleSignIn}
         disabled={submitting}
-        className="h-10 w-full gap-2"
+        className="h-10 w-full gap-2 border-rose-200/90 bg-white/70 hover:bg-rose-50/70 dark:bg-input/30 dark:hover:bg-input/50"
       >
         <GoogleIcon className="size-4" />
         Continue with Google
       </Button>
 
-      <p className="text-center text-sm text-muted-foreground">
+      <p className="text-center text-sm text-stone-600 dark:text-muted-foreground">
         New to WedPlan?{" "}
         <Link
           href="/sign-up"
-          className="font-medium text-champagne-700 underline-offset-4 hover:underline"
+          className="font-medium text-[#B76E79] underline-offset-4 hover:underline"
         >
           Create an account
         </Link>
@@ -136,7 +142,12 @@ export function SignInForm() {
 
 function GoogleIcon({ className }: { className?: string }) {
   return (
-    <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true" className={className}>
+    <svg
+      viewBox="0 0 24 24"
+      fill="currentColor"
+      aria-hidden="true"
+      className={className}
+    >
       <path d="M21.35 11.1h-9.17v2.73h6.51c-.33 3.81-3.5 5.48-6.5 5.48-4.1 0-7.19-2.94-7.19-7.31 0-4.27 2.98-7.31 7.16-7.31 3.03 0 4.77 1.84 4.77 1.84l2.07-1.81S16.56 2 12.1 2C6.87 2 2.03 6.16 2.03 12c0 5.83 4.36 10 9.97 10 4.98 0 8.7-3.37 8.7-8.31 0-1.01-.14-1.67-.35-2.59z" />
     </svg>
   )
