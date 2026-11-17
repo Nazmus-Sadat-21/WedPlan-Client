@@ -40,6 +40,8 @@ const buttonVariants = cva(
 )
 
 function Button({
+  render,
+  nativeButton,
   className,
   variant = "default",
   size = "default",
@@ -48,7 +50,11 @@ function Button({
   return (
     <ButtonPrimitive
       data-slot="button"
+      // Link/other non-button render targets must opt out of native button
+      // semantics, otherwise Base UI warns about lost a11y in dev.
+      nativeButton={nativeButton ?? (render ? false : undefined)}
       className={cn(buttonVariants({ variant, size, className }))}
+      render={render}
       {...props}
     />
   )

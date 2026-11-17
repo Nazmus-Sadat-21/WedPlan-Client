@@ -95,11 +95,15 @@ function Carousel({
 
   React.useEffect(() => {
     if (!api) return
-    onSelect(api)
+
+    // Sync the initial arrow state on the next tick: onSelect updates React
+    // state, which must not happen synchronously inside the effect body.
+    const frame = requestAnimationFrame(() => onSelect(api))
     api.on("reInit", onSelect)
     api.on("select", onSelect)
 
     return () => {
+      cancelAnimationFrame(frame)
       api?.off("select", onSelect)
     }
   }, [api, onSelect])
