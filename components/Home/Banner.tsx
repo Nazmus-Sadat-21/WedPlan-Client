@@ -86,32 +86,27 @@ export function Banner() {
             className="mt-9 flex w-full flex-col items-center justify-center gap-3.5 sm:w-auto sm:flex-row"
           >
             <Button
-              size="lg"
-              asChild
-              className="h-12 w-full rounded-full bg-[#B76E79] px-8 text-base font-medium text-white shadow-md shadow-rose-900/10 transition-all hover:bg-[#a25c67] hover:shadow-lg sm:w-auto"
+              render={
+                <Link href="/browse-services" className="inline-flex items-center gap-2" />
+              }
+              className="h-12 w-full rounded-full bg-[#B76E79] px-8 text-base font-medium text-[#fffdf8] shadow-md shadow-rose-900/10 transition-all hover:bg-[#a25c67] hover:shadow-lg sm:w-auto"
             >
-              <Link
-                href="/browse-services"
-                className="inline-flex items-center gap-2"
-              >
-                Explore Wedding Services
-                <ArrowRight className="size-4" />
-              </Link>
+              Explore Wedding Services
+              <ArrowRight className="size-4" />
             </Button>
 
             <Button
-              size="lg"
+              render={
+                <Link
+                  href="/browse-services?category=Wedding%20Venues"
+                  className="inline-flex items-center gap-2"
+                />
+              }
               variant="outline"
-              asChild
               className="h-12 w-full rounded-full border-rose-200/90 bg-white/90 px-8 text-base font-medium text-stone-800 shadow-xs backdrop-blur-md transition-all hover:border-rose-300 hover:bg-rose-50/90 hover:text-stone-950 sm:w-auto"
             >
-              <Link
-                href="/browse-services?category=Wedding+Venues"
-                className="inline-flex items-center gap-2"
-              >
-                <Search className="size-4 text-[#B76E79]" />
-                Find a Venue
-              </Link>
+              <Search className="size-4 text-[#B76E79]" />
+              Find a Venue
             </Button>
           </motion.div>
 

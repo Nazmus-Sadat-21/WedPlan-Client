@@ -19,7 +19,6 @@ import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
-  DropdownMenuLabel,
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
@@ -125,16 +124,36 @@ export function Navbar() {
               </DropdownMenuTrigger>
               <DropdownMenuContent
                 align="end"
-                className="w-60 rounded-2xl border-rose-200/70 bg-white/95 p-1.5 shadow-lg backdrop-blur-md"
+                className="w-64 rounded-2xl border-rose-200/70 bg-white/95 p-1.5 shadow-lg shadow-rose-950/5 backdrop-blur-md"
               >
-                <DropdownMenuLabel className="px-2.5 py-2">
-                  <p className="truncate text-sm font-medium text-stone-800">
-                    {user?.name ?? "My account"}
-                  </p>
-                  <p className="truncate text-xs font-normal text-stone-500">
-                    {user?.email ?? ""}
-                  </p>
-                </DropdownMenuLabel>
+                {/* User name + profile image header (plain div: not a menu
+                    group label, just decorative content) */}
+                <div className="mb-1 flex items-center gap-3 rounded-xl bg-gradient-to-r from-rose-50 to-[#FDFBF7] px-3 py-3 ring-1 ring-rose-100/80 dark:from-input/30 dark:to-input/10 dark:ring-input/30">
+                  <Avatar className="size-10 ring-2 ring-rose-200">
+                    {user?.image ? (
+                      <AvatarImage
+                        src={user.image}
+                        alt={user.name ?? "Profile"}
+                      />
+                    ) : null}
+                    <AvatarFallback className="bg-rose-100 text-sm font-medium text-[#B76E79]">
+                      {getUserInitials(user?.name)}
+                    </AvatarFallback>
+                  </Avatar>
+                  <div className="min-w-0">
+                    <p className="truncate text-sm font-semibold text-stone-800">
+                      {user?.name ?? "My account"}
+                    </p>
+                    <p className="truncate text-xs font-normal text-stone-500">
+                      {user?.email ?? ""}
+                    </p>
+                    {user?.role ? (
+                      <span className="mt-1 inline-flex items-center rounded-full bg-[#B76E79]/10 px-2 py-0.5 text-[10px] font-semibold tracking-wide text-[#9F5863] uppercase">
+                        {user.role}
+                      </span>
+                    ) : null}
+                  </div>
+                </div>
                 <DropdownMenuSeparator className="bg-rose-100" />
                 {user?.role ? (
                   <DropdownMenuItem
