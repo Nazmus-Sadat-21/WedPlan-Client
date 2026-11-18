@@ -38,6 +38,21 @@ function isAbort(error: unknown) {
   return error instanceof DOMException && error.name === "AbortError"
 }
 
+function getServiceTimestamp(service: Service): number {
+  if (service.createdAt) {
+    const parsed = new Date(service.createdAt).getTime()
+    if (!Number.isNaN(parsed)) return parsed
+  }
+
+  // Fallback to MongoDB ObjectId timestamp (first 8 hex characters)
+  if (typeof service._id === "string" && service._id.length >= 8) {
+    const hexSeconds = Number.parseInt(service._id.slice(0, 8), 16)
+    if (!Number.isNaN(hexSeconds)) return hexSeconds * 1000
+  }
+
+  return 0
+}
+
 export function FeaturedServices() {
   const [state, setState] = useState<LoadState>({
     status: "loading",
@@ -51,9 +66,13 @@ export function FeaturedServices() {
 
     fetchFeaturedServices({ signal: controller.signal })
       .then((services) => {
+        const sortedPublicServices = services
+          .filter(isPublicService)
+          .sort((a, b) => getServiceTimestamp(b) - getServiceTimestamp(a))
+
         setState({
           status: "success",
-          services: services.filter(isPublicService),
+          services: sortedPublicServices,
           error: null,
         })
       })
@@ -111,7 +130,11 @@ export function FeaturedServices() {
                 "The wedding services could not be loaded right now. Please try again."
               }
               action={
-                <Button onClick={retry} variant="outline" className="gap-2 rounded-full border-rose-200 hover:bg-rose-50">
+                <Button
+                  onClick={retry}
+                  variant="outline"
+                  className="gap-2 rounded-full border-rose-200 hover:bg-rose-50"
+                >
                   <RotateCcw className="size-4" />
                   Try again
                 </Button>

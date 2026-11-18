@@ -37,13 +37,6 @@ import { formatPrice, getUserInitials } from "@/lib/format"
 import type { Service, Vendor } from "@/lib/types"
 import { cn } from "@/lib/utils"
 
-function resolveVendor(service: Service): Vendor | null {
-  const vendor = service.vendor ?? service.vendorId
-  if (!vendor || typeof vendor === "string") return null
-  if (typeof vendor === "object" && "name" in vendor) return vendor as Vendor
-  return null
-}
-
 export default function BrowseServiceDetailsPage() {
   const params = useParams<{ id: string }>()
   const router = useRouter()
@@ -51,6 +44,7 @@ export default function BrowseServiceDetailsPage() {
   const user = sessionData?.user
 
   const [service, setService] = useState<Service | null>(null)
+  const [vendor, setVendor] = useState<Vendor | null>(null)
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
 
@@ -69,7 +63,7 @@ export default function BrowseServiceDetailsPage() {
     if (!params?.id) return
 
     let isMounted = true
-    async function fetchServiceDetails() {
+    async function fetchServiceAndVendor() {
       setLoading(true)
       setError(null)
       try {
@@ -92,6 +86,40 @@ export default function BrowseServiceDetailsPage() {
         if (isMounted) {
           setService(resolvedService)
         }
+
+        // Extract vendor identifier or object from service
+        const rawVendor = resolvedService.vendor ?? resolvedService.vendorId
+        let vendorIdToFetch: string | null = null
+
+        if (typeof rawVendor === "string") {
+          vendorIdToFetch = rawVendor
+        } else if (rawVendor && typeof rawVendor === "object" && "_id" in rawVendor) {
+          vendorIdToFetch = String(rawVendor._id)
+        }
+
+        if (vendorIdToFetch) {
+          try {
+            const vendorRes = await fetch(`${baseUrl}/users/${vendorIdToFetch}`, {
+              cache: "no-store",
+            })
+            if (vendorRes.ok) {
+              const vendorJson = await vendorRes.json()
+              const resolvedVendor = vendorJson?.data ?? vendorJson
+              if (isMounted && resolvedVendor) {
+                setVendor(resolvedVendor)
+              }
+            }
+          } catch {
+            // Fallback gracefully if separate user endpoint call fails
+            if (isMounted && typeof rawVendor === "object" && rawVendor !== null) {
+              setVendor(rawVendor as Vendor)
+            }
+          }
+        } else if (rawVendor && typeof rawVendor === "object") {
+          if (isMounted) {
+            setVendor(rawVendor as Vendor)
+          }
+        }
       } catch (err) {
         if (isMounted) {
           setError(
@@ -105,7 +133,7 @@ export default function BrowseServiceDetailsPage() {
       }
     }
 
-    fetchServiceDetails()
+    fetchServiceAndVendor()
     return () => {
       isMounted = false
     }
@@ -174,8 +202,7 @@ export default function BrowseServiceDetailsPage() {
   const galleryImages = rawImages.length > 0 ? rawImages : [fallbackImg]
   const currentImage = galleryImages[activeImageIdx] ?? galleryImages[0]
 
-  // Resolve vendor details
-  const vendor = resolveVendor(service)
+  // Resolved vendor details from fetched API data
   const vendorName = vendor?.name ?? "Verified WedPlan Partner"
   const vendorEmail = vendor?.email ?? null
   const vendorImage = vendor?.image ?? undefined
@@ -407,12 +434,12 @@ export default function BrowseServiceDetailsPage() {
               )}
             </div>
 
-            {/* Service Description Section */}
+            {/* Service Highlights Section (Replaced generic bullet points) */}
             <section className="rounded-3xl border border-rose-200/75 bg-white p-6 shadow-2xs sm:p-8">
               <div className="mb-4 flex items-center gap-2">
                 <Sparkles className="size-4 text-[#B76E79]" />
                 <h2 className="font-heading text-2xl font-semibold text-stone-900">
-                  About This Service
+                  Service Highlights &amp; Inclusions
                 </h2>
               </div>
 
@@ -421,16 +448,16 @@ export default function BrowseServiceDetailsPage() {
                   "Tailored wedding service crafted with meticulous attention to detail to make your celebration unforgettable."}
               </div>
 
-              {/* Quick Service Highlights */}
+              {/* Curated Wedding Feature Pills */}
               <div className="mt-7 grid gap-4 border-t border-rose-100 pt-6 sm:grid-cols-3">
                 <div className="flex items-start gap-3 rounded-2xl bg-[#FDFBF7] p-3.5 ring-1 ring-rose-100">
                   <CalendarHeart className="mt-0.5 size-5 shrink-0 text-[#B76E79]" />
                   <div>
                     <p className="text-xs font-semibold text-stone-800">
-                      Custom Scheduling
+                      Tailored Planning
                     </p>
                     <p className="mt-0.5 text-xs text-stone-500">
-                      Flexible event dates
+                      Customized to your vision
                     </p>
                   </div>
                 </div>
@@ -439,10 +466,10 @@ export default function BrowseServiceDetailsPage() {
                   <ShieldCheck className="mt-0.5 size-5 shrink-0 text-[#B76E79]" />
                   <div>
                     <p className="text-xs font-semibold text-stone-800">
-                      Verified Quality
+                      Secure Booking
                     </p>
                     <p className="mt-0.5 text-xs text-stone-500">
-                      Vetted wedding specialist
+                      Direct vendor confirmation
                     </p>
                   </div>
                 </div>
@@ -451,17 +478,17 @@ export default function BrowseServiceDetailsPage() {
                   <Clock className="mt-0.5 size-5 shrink-0 text-[#B76E79]" />
                   <div>
                     <p className="text-xs font-semibold text-stone-800">
-                      Prompt Response
+                      Priority Support
                     </p>
                     <p className="mt-0.5 text-xs text-stone-500">
-                      Direct vendor updates
+                      Dedicated wedding concierge
                     </p>
                   </div>
                 </div>
               </div>
             </section>
 
-            {/* Vendor Information Card */}
+            {/* Vendor Information Card (Fetched live from /users/:id) */}
             <section className="rounded-3xl border border-rose-200/75 bg-gradient-to-br from-white via-white to-rose-50/40 p-6 shadow-2xs sm:p-8">
               <p className="text-xs font-semibold tracking-[0.18em] text-[#B76E79] uppercase">
                 Hosted &amp; Managed By
