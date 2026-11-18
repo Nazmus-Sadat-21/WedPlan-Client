@@ -10,6 +10,8 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
+import { authControlClassName, authFocusRingClassName } from "@/components/auth/field-styles"
+import { GoogleSignInButton } from "@/components/auth/GoogleSignInButton"
 import { PasswordField } from "@/components/auth/PasswordField"
 import { authClient } from "@/lib/auth-client"
 import { getUserInitials } from "@/lib/format"
@@ -180,7 +182,8 @@ export function SignUpForm() {
                 onClick={() => setRole(option.value)}
                 aria-pressed={active}
                 className={cn(
-                  "rounded-xl border bg-white/70 p-3 text-left transition-all outline-none focus-visible:ring-3 focus-visible:ring-ring/50 dark:bg-input/20",
+                  "rounded-xl border bg-white/70 p-3 text-left transition-all dark:bg-input/20",
+                  authFocusRingClassName,
                   active
                     ? "border-[#B76E79] bg-rose-50/80 ring-1 ring-[#B76E79]/60 dark:bg-input/40"
                     : "border-rose-200/80 hover:border-[#B76E79]/50 dark:border-input"
@@ -220,7 +223,7 @@ export function SignUpForm() {
             placeholder="Jane Doe"
             autoComplete="name"
             aria-invalid={Boolean(fieldErrors.fullName)}
-            className="h-10 pl-9"
+            className={cn(authControlClassName, "pl-9")}
           />
         </div>
         {fieldErrors.fullName ? (
@@ -245,7 +248,7 @@ export function SignUpForm() {
               onChange={(event) => setBusinessName(event.target.value)}
               placeholder="e.g. Rosewood Events"
               autoComplete="organization"
-              className="h-10 pl-9"
+              className={cn(authControlClassName, "pl-9")}
             />
           </div>
         </div>
@@ -262,7 +265,7 @@ export function SignUpForm() {
           placeholder="you@example.com"
           autoComplete="email"
           aria-invalid={Boolean(fieldErrors.email)}
-          className="h-10"
+          className={authControlClassName}
         />
         {fieldErrors.email ? (
           <p className="text-xs text-destructive">{fieldErrors.email}</p>
@@ -300,7 +303,10 @@ export function SignUpForm() {
           <div className="min-w-0 flex-1">
             <label
               htmlFor="profileImage"
-              className="inline-flex h-9 cursor-pointer items-center gap-2 rounded-lg border border-rose-200/90 bg-white/70 px-3 text-sm font-medium text-foreground transition-colors hover:bg-rose-50/70 dark:border-input dark:bg-input/30 dark:hover:bg-input/50"
+              className={cn(
+                "inline-flex h-9 cursor-pointer items-center gap-2 rounded-lg border border-rose-200/90 bg-white/70 px-3 text-sm font-medium text-foreground transition-colors hover:bg-rose-50/70 dark:border-input dark:bg-input/30 dark:hover:bg-input/50",
+                authFocusRingClassName
+              )}
             >
               <ImagePlus className="size-4" />
               {imageFile ? "Change image" : "Upload photo"}
@@ -334,11 +340,26 @@ export function SignUpForm() {
       <Button
         type="submit"
         disabled={submitting}
-        className="h-10 w-full gap-2 bg-[#B76E79] text-[#fffdf8] hover:bg-[#a25a64]"
+        className="h-10 w-full gap-2 bg-[#B76E79] text-[#fffdf8] hover:bg-[#a25a64] focus-visible:border-[#B76E79] focus-visible:ring-[#B76E79]/30 dark:focus-visible:border-champagne-400 dark:focus-visible:ring-champagne-400/30"
       >
         {submitting ? <LoaderCircle className="size-4 animate-spin" /> : null}
         {submitting ? "Creating account…" : "Create Account"}
       </Button>
+
+      <div className="flex items-center gap-3">
+        <span className="h-px flex-1 bg-rose-200/80 dark:bg-input" />
+        <span className="text-xs text-stone-500 dark:text-muted-foreground">
+          or
+        </span>
+        <span className="h-px flex-1 bg-rose-200/80 dark:bg-input" />
+      </div>
+
+      <GoogleSignInButton
+        callbackURL="/sign-up"
+        role={role}
+        disabled={submitting}
+        label={`Sign up with Google as ${role === "vendor" ? "a vendor" : "a customer"}`}
+      />
 
       <p className="text-center text-sm text-stone-600 dark:text-muted-foreground">
         Already have an account?{" "}

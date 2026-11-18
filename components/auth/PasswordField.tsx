@@ -5,6 +5,7 @@ import { Eye, EyeOff } from "lucide-react"
 
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
+import { authControlClassName } from "@/components/auth/field-styles"
 import { cn } from "@/lib/utils"
 
 type PasswordFieldProps = {
@@ -43,13 +44,17 @@ export function PasswordField({
           placeholder={placeholder}
           autoComplete={autoComplete}
           aria-invalid={Boolean(error)}
-          className={cn("h-10 pr-10", error && "border-destructive")}
+          className={cn(
+            authControlClassName,
+            "pr-10",
+            error && "border-destructive focus-visible:border-destructive"
+          )}
         />
         <button
           type="button"
           onClick={() => setVisible((current) => !current)}
           aria-label={visible ? "Hide password" : "Show password"}
-          className="absolute inset-y-0 right-0 flex w-10 items-center justify-center rounded-r-lg text-muted-foreground transition-colors hover:text-foreground"
+          className="absolute inset-y-0 right-0 flex w-10 items-center justify-center rounded-r-lg text-muted-foreground transition-colors outline-none hover:text-foreground focus-visible:text-[#B76E79] focus-visible:ring-2 focus-visible:ring-[#B76E79]/30 focus-visible:ring-inset dark:focus-visible:text-champagne-400 dark:focus-visible:ring-champagne-400/30"
         >
           {visible ? <EyeOff className="size-4" /> : <Eye className="size-4" />}
         </button>

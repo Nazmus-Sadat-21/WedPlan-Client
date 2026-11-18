@@ -9,15 +9,46 @@ export const auth = betterAuth({
   emailAndPassword: {
     enabled: true,
   },
-  //   socialProviders: {
-  //     google: {
-  //       clientId: process.env.GOOGLE_CLIENT_ID as string,
-  //       clientSecret: process.env.GOOGLE_CLIENT_SECRET as string,
-  //     },
-  //   },
+  socialProviders: {
+    google: {
+      clientId: process.env.GOOGLE_CLIENT_ID as string,
+      clientSecret: process.env.GOOGLE_CLIENT_SECRET as string,
+    },
+  },
   database: mongodbAdapter(db, {
     client,
   }),
+  // Defence in depth: a public request can only create a customer or vendor,
+  // and can never promote itself to admin. Admins are assigned directly in the
+  // database, as required by the assignment brief.
+  databaseHooks: {
+    user: {
+      create: {
+        before: async (user) => ({
+          data: {
+            ...user,
+            role: user.role === "vendor" ? "vendor" : "customer",
+            isBlocked: false,
+            subscriptionPlan: "free",
+          },
+        }),
+      },
+      update: {
+        before: async (user) => {
+          if (
+            user.role !== undefined &&
+            user.role !== "customer" &&
+            user.role !== "vendor"
+          ) {
+            const sanitized = { ...user }
+            delete sanitized.role
+            return { data: sanitized }
+          }
+          return { data: user }
+        },
+      },
+    },
+  },
   user: {
     additionalFields: {
       // Role drives dashboards and server authorization. Public sign-up only
