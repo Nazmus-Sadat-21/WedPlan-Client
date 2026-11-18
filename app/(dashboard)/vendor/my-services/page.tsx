@@ -1,16 +1,17 @@
 import type { Metadata } from "next"
 
-import { ComingSoon } from "@/components/Shared/ComingSoon"
+import { ManageService } from "@/components/vendor/ManageService"
 
-export const metadata: Metadata = { title: "My Services" }
+export const metadata: Metadata = {
+  title: "My Services | WedPlan Vendor Studio",
+  description:
+    "View, update, and delete your wedding services, monitor approval status, and manage booking availability.",
+}
 
 export default function MyServicesPage() {
   return (
-    <ComingSoon
-      title="My Services"
-      description="View, update and delete your services, check approval status and manage availability."
-      backHref="/vendor"
-      backLabel="Back to Overview"
-    />
+    <section className="mx-auto w-full max-w-7xl px-4 py-6 sm:px-6 lg:px-8 lg:py-8">
+      <ManageService />
+    </section>
   )
 }
