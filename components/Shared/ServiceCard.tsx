@@ -46,7 +46,7 @@ export function ServiceCard({
       )}
     >
       <Link
-        href={`/services/${service._id}`}
+        href={`/browse-services/${service._id}`}
         className="flex h-full flex-col focus-visible:outline-none"
       >
         <div className="relative aspect-[4/3] overflow-hidden bg-rose-50">
