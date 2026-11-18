@@ -11,7 +11,7 @@ import { EmptyState } from "@/components/Shared/EmptyState"
 import { ServiceCard } from "@/components/Shared/ServiceCard"
 import { ServiceCardSkeletonGrid } from "@/components/Shared/ServiceCardSkeleton"
 import { SectionHeading } from "@/components/Shared/SectionHeading"
-import { fetchFeaturedServices } from "@/lib/api"
+import { fetchFeaturedServices, isPublicService } from "@/lib/api"
 import type { Service } from "@/lib/types"
 
 type LoadState = {
@@ -53,7 +53,7 @@ export function FeaturedServices() {
       .then((services) => {
         setState({
           status: "success",
-          services: services.slice(0, 6),
+          services: services.filter(isPublicService),
           error: null,
         })
       })

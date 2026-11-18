@@ -69,6 +69,11 @@ export function fetchFeaturedServices(
   return fetchServices(options)
 }
 
+/** Only approved and available services should appear publicly. */
+export function isPublicService(service: Service): boolean {
+  return service.status === "approved" && service.availability !== false
+}
+
 /** Services belonging to one vendor (includes pending/rejected services). */
 export async function fetchVendorServices(
   vendorId: string,
