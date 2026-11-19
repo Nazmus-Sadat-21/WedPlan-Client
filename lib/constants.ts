@@ -3,7 +3,13 @@ export const API_BASE_URL = process.env.NEXT_PUBLIC_SERVER_API ?? ""
 export const API_ENDPOINTS = {
   services: `${API_BASE_URL}/services`,
   serviceById: (id: string) => `${API_BASE_URL}/services/${id}`,
+  serviceStatus: (id: string) => `${API_BASE_URL}/services/${id}/status`,
+  adminServiceById: (id: string) => `${API_BASE_URL}/admin/services/${id}`,
   vendorServices: `${API_BASE_URL}/vendor/services`,
+  users: `${API_BASE_URL}/users`,
+  userById: (id: string) => `${API_BASE_URL}/users/${id}`,
+  blockUser: (id: string) => `${API_BASE_URL}/users/${id}/block`,
+  unblockUser: (id: string) => `${API_BASE_URL}/users/${id}/unblock`,
 } as const
 
 export const CURRENCY = "USD"

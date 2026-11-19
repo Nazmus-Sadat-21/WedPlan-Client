@@ -251,6 +251,13 @@ export default function BrowseServiceDetailsPage() {
       return
     }
 
+    if (user.isBlocked) {
+      toast.error(
+        "Your account is blocked, so booking requests are unavailable. Contact support for help."
+      )
+      return
+    }
+
     if (user.role && user.role !== "customer") {
       toast.error("Only customer accounts can submit service bookings.")
       return

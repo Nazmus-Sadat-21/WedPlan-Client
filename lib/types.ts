@@ -4,6 +4,19 @@ export type ServiceAvailability = boolean | "active" | "inactive"
 
 export type BookingStatus = "pending" | "accepted" | "rejected" | "cancelled"
 
+/** User document returned by the admin `GET /users` endpoint. */
+export interface AdminUser {
+  _id: string
+  name?: string | null
+  email?: string | null
+  emailVerified?: boolean
+  image?: string | null
+  role?: string
+  isBlocked?: boolean
+  subscriptionPlan?: string
+  createdAt?: string
+}
+
 export interface Vendor {
   _id: string
   name: string

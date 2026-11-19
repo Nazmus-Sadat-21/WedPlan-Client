@@ -1,16 +1,17 @@
 import type { Metadata } from "next"
 
-import { ComingSoon } from "@/components/Shared/ComingSoon"
+import { ManageServices } from "@/components/admin/ManageServices"
 
-export const metadata: Metadata = { title: "Manage Services" }
+export const metadata: Metadata = {
+  title: "Manage Services | WedPlan Admin",
+  description:
+    "Review vendor submissions, approve or reject services, change publication status and remove inappropriate listings.",
+}
 
 export default function ManageServicesPage() {
   return (
-    <ComingSoon
-      title="Manage Services"
-      description="Review pending submissions, approve or reject services and remove inappropriate listings."
-      backHref="/admin"
-      backLabel="Back to Overview"
-    />
+    <section className="mx-auto w-full max-w-7xl">
+      <ManageServices />
+    </section>
   )
 }
