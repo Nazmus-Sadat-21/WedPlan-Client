@@ -1,16 +1,13 @@
 "use client"
 
-import { useCallback, useEffect, useMemo, useState } from "react"
+import { useEffect, useMemo, useState } from "react"
 import Image from "next/image"
 import Link from "next/link"
-import { motion } from "motion/react"
 import {
   AlertCircle,
-  ArrowRight,
   BadgeCheck,
   Clock,
   Eye,
-  EyeOff,
   ImagePlus,
   LoaderCircle,
   MapPin,
@@ -21,7 +18,6 @@ import {
   Sparkles,
   Trash2,
   X,
-  XCircle,
 } from "lucide-react"
 import { toast } from "sonner"
 import {
@@ -47,7 +43,11 @@ import { Label } from "@/components/ui/label"
 import { Skeleton } from "@/components/ui/skeleton"
 import { Textarea } from "@/components/ui/textarea"
 import { useSession } from "@/lib/auth-client"
-import { CATEGORY_IMAGES, SERVICE_CATEGORIES } from "@/lib/constants"
+import {
+  API_ENDPOINTS,
+  CATEGORY_IMAGES,
+  SERVICE_CATEGORIES,
+} from "@/lib/constants"
 import { formatPrice } from "@/lib/format"
 import type { Service } from "@/lib/types"
 import { cn } from "@/lib/utils"
@@ -61,7 +61,7 @@ type EditFormState = {
   location: string
   description: string
   imagesText: string
-  isAvailable: boolean
+  availability: boolean
 }
 
 const controlClassName =
@@ -71,28 +71,25 @@ const focusRingClassName =
   "outline-none focus-visible:border-[#B76E79] focus-visible:ring-[3px] focus-visible:ring-[#B76E79]/25 dark:focus-visible:border-champagne-400 dark:focus-visible:ring-champagne-400/30"
 
 function getApprovalStatus(service: Service): "approved" | "pending" | "rejected" {
-  const raw = (service.approvalStatus ?? service.status ?? "pending")
-    .toString()
-    .toLowerCase()
+  const raw = String(service.status ?? "pending").toLowerCase()
   if (raw === "approved") return "approved"
   if (raw === "rejected") return "rejected"
   return "pending"
 }
 
 function isServiceAvailable(service: Service): boolean {
-  const status = getApprovalStatus(service)
-  if (status === "rejected") return false
-  if (typeof service.isAvailable === "boolean") return service.isAvailable
-  if (typeof service.available === "boolean") return service.available
-  return true
+  if (getApprovalStatus(service) === "rejected") return false
+  return service.availability !== false
 }
 
 function resolveServiceVendorId(service: Service): string | null {
-  const raw = service.vendorId ?? service.vendor
+  const raw: unknown = service.vendorId ?? service.vendor
   if (!raw) return null
   if (typeof raw === "string") return raw
-  if (typeof raw === "object" && "_id" in raw) return String(raw._id)
-  if (typeof raw === "object" && "id" in raw) return String(raw.id)
+  if (typeof raw === "object") {
+    if ("_id" in raw) return String((raw as { _id: unknown })._id)
+    if ("id" in raw) return String((raw as { id: unknown }).id)
+  }
   return null
 }
 
@@ -103,6 +100,7 @@ export function ManageService() {
   const [services, setServices] = useState<Service[]>([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
+  const [reloadKey, setReloadKey] = useState(0)
 
   // Filters
   const [searchQuery, setSearchQuery] = useState("")
@@ -117,6 +115,8 @@ export function ManageService() {
   const [savingEdit, setSavingEdit] = useState(false)
   const [deleting, setDeleting] = useState(false)
 
+  const userId = user?.id
+
   const [editForm, setEditForm] = useState<EditFormState>({
     serviceName: "",
     category: SERVICE_CATEGORIES[0]?.name ?? "Wedding Venues",
@@ -124,63 +124,71 @@ export function ManageService() {
     location: "",
     description: "",
     imagesText: "",
-    isAvailable: true,
+    availability: true,
   })
 
-  const fetchVendorServices = useCallback(async () => {
-    if (!user?.id) return
+  useEffect(() => {
+    if (sessionLoading || !userId) return
 
-    setLoading(true)
-    setError(null)
-    try {
-      const baseUrl = process.env.NEXT_PUBLIC_SERVER_API ?? ""
+    const controller = new AbortController()
+    let active = true
 
-      let res = await fetch(`${baseUrl}/services/vendor/${user.id}`, {
-        credentials: "include",
-        cache: "no-store",
-      })
-
-      if (!res.ok) {
-        res = await fetch(`${baseUrl}/services?vendorId=${user.id}`, {
+    async function loadServices() {
+      try {
+        const res = await fetch(API_ENDPOINTS.services, {
           credentials: "include",
           cache: "no-store",
+          signal: controller.signal,
         })
+
+        if (!res.ok) {
+          const body = await res.json().catch(() => null)
+          throw new Error(
+            body?.message ?? "Could not load your wedding services."
+          )
+        }
+
+        const json = await res.json()
+        const list: Service[] = Array.isArray(json)
+          ? json
+          : Array.isArray(json?.data)
+            ? json.data
+            : []
+
+        if (!active) return
+
+        setServices(
+          list.filter(
+            (item) => resolveServiceVendorId(item) === String(userId)
+          )
+        )
+        setError(null)
+      } catch (err) {
+        if (!active || controller.signal.aborted) return
+        const msg =
+          err instanceof Error ? err.message : "Failed to load your services."
+        setError(msg)
+        toast.error(msg)
+      } finally {
+        if (active) setLoading(false)
       }
-
-      if (!res.ok) {
-        throw new Error("Could not load your wedding services.")
-      }
-
-      const json = await res.json()
-      const list: Service[] = Array.isArray(json)
-        ? json
-        : Array.isArray(json?.data)
-          ? json.data
-          : []
-
-      const mine = list.filter((item) => {
-        const ownerId = resolveServiceVendorId(item)
-        return !ownerId || ownerId === String(user.id)
-      })
-
-      setServices(mine)
-    } catch (err) {
-      const msg =
-        err instanceof Error ? err.message : "Failed to load your services."
-      setError(msg)
-      toast.error(msg)
-    } finally {
-      setLoading(false)
     }
-  }, [user?.id])
 
-  useEffect(() => {
-    if (!sessionLoading && user?.id) {
-      fetchVendorServices()
-    } else if (!sessionLoading && !user) {
-      setLoading(false)
+    loadServices()
+
+    return () => {
+      active = false
+      controller.abort()
     }
-  }, [sessionLoading, user, fetchVendorServices])
+  }, [sessionLoading, userId, reloadKey])
+
+  function reloadServices() {
+    setLoading(true)
+    setError(null)
+    setReloadKey((key) => key + 1)
+  }
+
+  const showLoading = sessionLoading || (loading && Boolean(userId))
 
   const stats = useMemo(() => {
     let approved = 0
@@ -233,7 +241,7 @@ export function ManageService() {
       location: service.location ?? "",
       description: service.description ?? "",
       imagesText: Array.isArray(service.images) ? service.images.join("\n") : "",
-      isAvailable: status === "rejected" ? false : isServiceAvailable(service),
+      availability: status === "rejected" ? false : isServiceAvailable(service),
     })
   }
 
@@ -251,25 +259,22 @@ export function ManageService() {
 
     setTogglingId(service._id)
     try {
-      const baseUrl = process.env.NEXT_PUBLIC_SERVER_API ?? ""
-      const res = await fetch(`${baseUrl}/services/${service._id}`, {
+      const res = await fetch(API_ENDPOINTS.serviceById(service._id), {
         method: "PATCH",
         headers: { "Content-Type": "application/json" },
         credentials: "include",
-        body: JSON.stringify({
-          isAvailable: nextAvail,
-          available: nextAvail,
-        }),
+        body: JSON.stringify({ availability: nextAvail }),
       })
 
       if (!res.ok) {
-        throw new Error("Could not update service availability.")
+        const body = await res.json().catch(() => null)
+        throw new Error(body?.message ?? "Could not update service availability.")
       }
 
       setServices((prev) =>
         prev.map((item) =>
           item._id === service._id
-            ? { ...item, isAvailable: nextAvail, available: nextAvail }
+            ? { ...item, availability: nextAvail }
             : item
         )
       )
@@ -309,11 +314,10 @@ export function ManageService() {
 
     const status = getApprovalStatus(editService)
     const enforcedAvailability =
-      status === "rejected" ? false : editForm.isAvailable
+      status === "rejected" ? false : editForm.availability
 
     setSavingEdit(true)
     try {
-      const baseUrl = process.env.NEXT_PUBLIC_SERVER_API ?? ""
       const payload = {
         serviceName: editForm.serviceName.trim(),
         category: editForm.category,
@@ -321,11 +325,10 @@ export function ManageService() {
         location: editForm.location.trim(),
         description: editForm.description.trim(),
         images: parsedImages,
-        isAvailable: enforcedAvailability,
-        available: enforcedAvailability,
+        availability: enforcedAvailability,
       }
 
-      const res = await fetch(`${baseUrl}/services/${editService._id}`, {
+      const res = await fetch(API_ENDPOINTS.serviceById(editService._id), {
         method: "PATCH",
         headers: { "Content-Type": "application/json" },
         credentials: "include",
@@ -364,14 +367,14 @@ export function ManageService() {
 
     setDeleting(true)
     try {
-      const baseUrl = process.env.NEXT_PUBLIC_SERVER_API ?? ""
-      const res = await fetch(`${baseUrl}/services/${deleteTarget._id}`, {
+      const res = await fetch(API_ENDPOINTS.serviceById(deleteTarget._id), {
         method: "DELETE",
         credentials: "include",
       })
 
       if (!res.ok) {
-        throw new Error("Could not delete this service.")
+        const body = await res.json().catch(() => null)
+        throw new Error(body?.message ?? "Could not delete this service.")
       }
 
       setServices((prev) =>
@@ -408,16 +411,14 @@ export function ManageService() {
         </div>
 
         <Button
-          asChild
+          render={<Link href="/vendor/add-service" />}
           className={cn(
             "h-11 shrink-0 gap-2 rounded-full bg-[#B76E79] px-6 text-sm font-medium text-[#fffdf8] shadow-md shadow-rose-900/10 transition-all hover:bg-[#a25c67] hover:shadow-lg",
             focusRingClassName
           )}
         >
-          <Link href="/vendor/add-service">
-            <Plus className="size-4" />
-            Add New Service
-          </Link>
+          <Plus className="size-4" />
+          Add New Service
         </Button>
       </div>
 
@@ -522,7 +523,7 @@ export function ManageService() {
       </div>
 
       {/* Table Content Area */}
-      {loading || sessionLoading ? (
+      {showLoading ? (
         <div className="space-y-3">
           {Array.from({ length: 5 }).map((_, index) => (
             <Skeleton
@@ -541,7 +542,7 @@ export function ManageService() {
             {error}
           </p>
           <Button
-            onClick={fetchVendorServices}
+            onClick={reloadServices}
             variant="outline"
             className="mt-5 gap-2 rounded-full border-rose-200 hover:bg-rose-50 dark:border-input dark:hover:bg-input/50"
           >
@@ -566,16 +567,14 @@ export function ManageService() {
           </p>
           {services.length === 0 ? (
             <Button
-              asChild
+              render={<Link href="/vendor/add-service" />}
               className={cn(
                 "mt-6 gap-2 rounded-full bg-[#B76E79] px-6 text-[#fffdf8] hover:bg-[#a25c67]",
                 focusRingClassName
               )}
             >
-              <Link href="/dashboard/vendor/add-service">
-                <Plus className="size-4" />
-                Create First Service
-              </Link>
+              <Plus className="size-4" />
+              Create First Service
             </Button>
           ) : (
             <Button
@@ -884,16 +883,14 @@ export function ManageService() {
                   {getApprovalStatus(viewService) === "approved" &&
                   isServiceAvailable(viewService) ? (
                     <Button
-                      asChild
+                      render={<Link href={`/browse-services/${viewService._id}`} />}
                       variant="outline"
                       className={cn(
                         "rounded-full border-rose-200 text-stone-700 hover:bg-rose-50 dark:border-input dark:text-foreground dark:hover:bg-input/50",
                         focusRingClassName
                       )}
                     >
-                      <Link href={`/browse-services/${viewService._id}`}>
-                        Open Public Page
-                      </Link>
+                      Open Public Page
                     </Button>
                   ) : (
                     <span className="text-xs text-stone-500 dark:text-muted-foreground">
@@ -1061,11 +1058,11 @@ export function ManageService() {
                 </div>
                 <input
                   type="checkbox"
-                  checked={editForm.isAvailable}
+                  checked={editForm.availability}
                   onChange={(e) =>
                     setEditForm((f) => ({
                       ...f,
-                      isAvailable: e.target.checked,
+                      availability: e.target.checked,
                     }))
                   }
                   className="size-4 accent-[#B76E79]"
