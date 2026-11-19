@@ -1,6 +1,6 @@
 "use client"
 
-import { useEffect, useMemo, useState } from "react"
+import { useEffect, useMemo, useRef, useState } from "react"
 import Image from "next/image"
 import Link from "next/link"
 import {
@@ -50,6 +50,7 @@ import {
   SERVICE_CATEGORIES,
 } from "@/lib/constants"
 import { formatPrice } from "@/lib/format"
+import { uploadToImgbb } from "@/lib/imgbb"
 import type { Service } from "@/lib/types"
 import { cn } from "@/lib/utils"
 
@@ -61,9 +62,15 @@ type EditFormState = {
   price: string
   location: string
   description: string
-  imagesText: string
+  images: string[] // existing image URLs
   availability: boolean
 }
+
+// A photo picked in the edit dialog that has not been uploaded yet.
+type NewImage = { id: string; file: File; previewUrl: string }
+
+const MAX_IMAGES = 8
+const MAX_IMAGE_SIZE = 5 * 1024 * 1024
 
 const controlClassName =
   "h-10 border-rose-200/90 bg-white/80 focus-visible:border-[#B76E79] focus-visible:ring-[3px] focus-visible:ring-[#B76E79]/25 dark:border-input dark:bg-input/20 dark:focus-visible:border-champagne-400 dark:focus-visible:ring-champagne-400/30"
@@ -124,9 +131,68 @@ export function ManageService() {
     price: "",
     location: "",
     description: "",
-    imagesText: "",
+    images: [],
     availability: true,
   })
+
+  // Newly picked (not yet uploaded) photos for the edit dialog
+  const [newImages, setNewImages] = useState<NewImage[]>([])
+  const imageInputRef = useRef<HTMLInputElement>(null)
+
+  function clearNewImages() {
+    newImages.forEach((img) => URL.revokeObjectURL(img.previewUrl))
+    setNewImages([])
+    if (imageInputRef.current) imageInputRef.current.value = ""
+  }
+
+  function closeEditModal() {
+    clearNewImages()
+    setEditService(null)
+  }
+
+  function handleImageFiles(event: React.ChangeEvent<HTMLInputElement>) {
+    const files = Array.from(event.target.files ?? [])
+    event.target.value = ""
+    if (files.length === 0) return
+
+    const accepted: NewImage[] = []
+    for (const file of files) {
+      if (!file.type.startsWith("image/")) {
+        toast.error(`"${file.name}" is not an image file.`)
+        continue
+      }
+      if (file.size > MAX_IMAGE_SIZE) {
+        toast.error(`"${file.name}" is larger than 5 MB.`)
+        continue
+      }
+      if (
+        editForm.images.length + newImages.length + accepted.length >=
+        MAX_IMAGES
+      ) {
+        toast.error(`You can add up to ${MAX_IMAGES} photos.`)
+        break
+      }
+      accepted.push({
+        id: `${file.name}-${file.size}-${crypto.randomUUID()}`,
+        file,
+        previewUrl: URL.createObjectURL(file),
+      })
+    }
+
+    if (accepted.length > 0) setNewImages((prev) => [...prev, ...accepted])
+  }
+
+  function removeExistingImage(url: string) {
+    setEditForm((f) => ({ ...f, images: f.images.filter((u) => u !== url) }))
+  }
+
+  function removeNewImage(id: string) {
+    setNewImages((prev) => {
+      const target = prev.find((img) => img.id === id)
+      if (target) URL.revokeObjectURL(target.previewUrl)
+      return prev.filter((img) => img.id !== id)
+    })
+  }
 
   useEffect(() => {
     if (sessionLoading || !userId) return
@@ -234,6 +300,7 @@ export function ManageService() {
 
   function openEditModal(service: Service) {
     const status = getApprovalStatus(service)
+    clearNewImages()
     setEditService(service)
     setEditForm({
       serviceName: service.serviceName ?? "",
@@ -241,7 +308,7 @@ export function ManageService() {
       price: String(service.price ?? ""),
       location: service.location ?? "",
       description: service.description ?? "",
-      imagesText: Array.isArray(service.images) ? service.images.join("\n") : "",
+      images: Array.isArray(service.images) ? service.images : [],
       availability: status === "rejected" ? false : isServiceAvailable(service),
     })
   }
@@ -317,11 +384,6 @@ export function ManageService() {
       return
     }
 
-    const parsedImages = editForm.imagesText
-      .split(/[\n,]+/)
-      .map((u) => u.trim())
-      .filter(Boolean)
-
     const status = getApprovalStatus(editService)
     const enforcedAvailability =
       status === "rejected" ? false : editForm.availability
@@ -333,6 +395,23 @@ export function ManageService() {
 
     setSavingEdit(true)
     try {
+      // Upload any newly picked photos first, then save the combined list.
+      let uploadedUrls: string[] = []
+      if (newImages.length > 0) {
+        try {
+          uploadedUrls = await Promise.all(
+            newImages.map((img) => uploadToImgbb(img.file))
+          )
+        } catch (uploadError) {
+          toast.error(
+            uploadError instanceof Error
+              ? uploadError.message
+              : "Image upload failed."
+          )
+          return
+        }
+      }
+
       const payload = {
         vendorId: userId,
         serviceName: editForm.serviceName.trim(),
@@ -340,7 +419,7 @@ export function ManageService() {
         price: parsedPrice,
         location: editForm.location.trim(),
         description: editForm.description.trim(),
-        images: parsedImages,
+        images: [...editForm.images, ...uploadedUrls],
         availability: enforcedAvailability ? "active" : "inactive",
       }
 
@@ -368,7 +447,7 @@ export function ManageService() {
       )
 
       toast.success("Service details updated successfully!")
-      setEditService(null)
+      closeEditModal()
     } catch (err) {
       toast.error(
         err instanceof Error ? err.message : "Could not save changes."
@@ -959,7 +1038,7 @@ export function ManageService() {
       {/* UPDATE / EDIT SERVICE DIALOG */}
       <Dialog
         open={Boolean(editService)}
-        onOpenChange={(open) => !open && setEditService(null)}
+        onOpenChange={(open) => !open && !savingEdit && closeEditModal()}
       >
         <DialogContent className="max-h-[90svh] overflow-y-auto rounded-3xl border-rose-200/80 bg-[#FDFBF7] dark:border-input dark:bg-card sm:max-w-xl">
           <DialogHeader>
@@ -1050,24 +1129,94 @@ export function ManageService() {
               />
             </div>
 
-            <div className="space-y-1.5">
-              <Label
-                htmlFor="edit-images"
-                className="flex items-center gap-1.5"
-              >
+            {/* Service images: file input with previews */}
+            <div className="space-y-2">
+              <Label className="flex items-center gap-1.5">
                 <ImagePlus className="size-3.5 text-[#B76E79]" />
-                Service Image URLs (one per line)
+                Service Images
               </Label>
-              <Textarea
+
+              {editForm.images.length + newImages.length > 0 ? (
+                <div className="grid grid-cols-3 gap-2.5 sm:grid-cols-4">
+                  {editForm.images.map((url, i) => (
+                    <div
+                      key={`${url}-${i}`}
+                      className="relative aspect-[4/3] overflow-hidden rounded-xl border border-rose-200/70 dark:border-input"
+                    >
+                      <Image
+                        src={url}
+                        alt={`Service photo ${i + 1}`}
+                        fill
+                        sizes="120px"
+                        className="object-cover"
+                      />
+                      {i === 0 ? (
+                        <span className="absolute bottom-1 left-1 rounded-full bg-white/90 px-2 py-0.5 text-[10px] font-semibold text-[#9F5863]">
+                          Cover
+                        </span>
+                      ) : null}
+                      <button
+                        type="button"
+                        onClick={() => removeExistingImage(url)}
+                        aria-label="Remove photo"
+                        className="absolute top-1 right-1 grid size-6 place-items-center rounded-full bg-stone-900/70 text-white transition-colors hover:bg-stone-900"
+                      >
+                        <X className="size-3.5" />
+                      </button>
+                    </div>
+                  ))}
+                  {newImages.map((img) => (
+                    <div
+                      key={img.id}
+                      className="relative aspect-[4/3] overflow-hidden rounded-xl border border-dashed border-[#B76E79]/60"
+                    >
+                      <Image
+                        src={img.previewUrl}
+                        alt={img.file.name}
+                        fill
+                        unoptimized
+                        sizes="120px"
+                        className="object-cover"
+                      />
+                      <span className="absolute bottom-1 left-1 rounded-full bg-[#B76E79] px-2 py-0.5 text-[10px] font-semibold text-white">
+                        New
+                      </span>
+                      <button
+                        type="button"
+                        onClick={() => removeNewImage(img.id)}
+                        aria-label="Remove photo"
+                        className="absolute top-1 right-1 grid size-6 place-items-center rounded-full bg-stone-900/70 text-white transition-colors hover:bg-stone-900"
+                      >
+                        <X className="size-3.5" />
+                      </button>
+                    </div>
+                  ))}
+                </div>
+              ) : null}
+
+              <label
+                htmlFor="edit-images"
+                className={cn(
+                  "inline-flex h-9 cursor-pointer items-center gap-2 rounded-lg border border-rose-200/90 bg-white/70 px-3 text-sm font-medium text-foreground transition-colors hover:bg-rose-50/70 dark:border-input dark:bg-input/30 dark:hover:bg-input/50",
+                  focusRingClassName
+                )}
+              >
+                <ImagePlus className="size-4" />
+                Upload photos
+              </label>
+              <input
+                ref={imageInputRef}
                 id="edit-images"
-                rows={3}
-                placeholder="https://example.com/photo-1.jpg"
-                value={editForm.imagesText}
-                onChange={(e) =>
-                  setEditForm((f) => ({ ...f, imagesText: e.target.value }))
-                }
-                className={cn(controlClassName, "h-auto font-mono text-xs py-2")}
+                type="file"
+                accept="image/*"
+                multiple
+                onChange={handleImageFiles}
+                className="sr-only"
               />
+              <p className="text-xs text-muted-foreground">
+                PNG, JPG or WebP, up to 5 MB each ({MAX_IMAGES} photos max). The
+                first photo is the cover.
+              </p>
             </div>
 
             {editService && getApprovalStatus(editService) !== "rejected" ? (
@@ -1099,7 +1248,7 @@ export function ManageService() {
                 type="button"
                 variant="outline"
                 disabled={savingEdit}
-                onClick={() => setEditService(null)}
+                onClick={closeEditModal}
                 className={cn("rounded-full border-rose-200 dark:border-input", focusRingClassName)}
               >
                 Cancel

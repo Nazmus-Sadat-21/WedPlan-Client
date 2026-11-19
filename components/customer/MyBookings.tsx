@@ -744,7 +744,7 @@ export function MyBookings() {
         <DialogContent className="max-h-[90svh] overflow-y-auto rounded-3xl border-rose-200/80 bg-[#FDFBF7] p-0 sm:max-w-2xl dark:border-input dark:bg-card">
           {viewBooking && viewStatus && viewVendor ? (
             <>
-              <div className="relative aspect-[16/8] w-full overflow-hidden bg-rose-100 dark:bg-input/30">
+              <div className="relative aspect-[16/6.8] w-full overflow-hidden bg-rose-100 dark:bg-input/30">
                 <Image
                   src={viewCover}
                   alt={viewBooking.service?.serviceName ?? "Booking service"}
