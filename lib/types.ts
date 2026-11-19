@@ -40,3 +40,29 @@ export interface Service {
   vendor?: Vendor
   vendorId?: string | Vendor
 }
+
+/** Vendor details embedded in a customer booking by `GET /bookings/customer/:id`. */
+export interface BookingVendor {
+  _id: string
+  name?: string | null
+  email?: string | null
+  image?: string | null
+  businessName?: string | null
+}
+
+/** A customer booking enriched with its service and vendor documents. */
+export interface Booking {
+  _id: string
+  serviceId: string
+  vendorId: string
+  customerId: string
+  eventDate: string
+  eventLocation: string
+  message?: string
+  status: BookingStatus | string
+  createdAt?: string
+  /** Populated by the API; null if the service was removed after booking. */
+  service?: Service | null
+  /** Populated by the API; null if the vendor account no longer exists. */
+  vendor?: BookingVendor | null
+}

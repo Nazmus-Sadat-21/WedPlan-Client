@@ -76,11 +76,13 @@ export default function AdminOverviewPage() {
         setCounts({
           users: users.length,
           vendors: users.filter((user) => user.role === "vendor").length,
-          customers: users.filter((user) => user.role !== "vendor" && user.role !== "admin")
-            .length,
+          customers: users.filter(
+            (user) => user.role !== "vendor" && user.role !== "admin"
+          ).length,
           services: services.length,
           pendingServices: services.filter(
-            (service) => String(service.status ?? "").toLowerCase() === "pending"
+            (service) =>
+              String(service.status ?? "").toLowerCase() === "pending"
           ).length,
         })
       } catch {
@@ -114,10 +116,22 @@ export default function AdminOverviewPage() {
     <>
       <OverviewHeader subtitle="Manage users, services and platform transactions." />
       <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-3">
-        <StatCard label="Registered Users" value={stats.users} icon={UsersRound} />
+        <StatCard
+          label="Registered Users"
+          value={stats.users}
+          icon={UsersRound}
+        />
         <StatCard label="Total Vendors" value={stats.vendors} icon={Store} />
-        <StatCard label="Total Customers" value={stats.customers} icon={UserRound} />
-        <StatCard label="Total Services" value={stats.services} icon={NotebookTabs} />
+        <StatCard
+          label="Total Customers"
+          value={stats.customers}
+          icon={UserRound}
+        />
+        <StatCard
+          label="Total Services"
+          value={stats.services}
+          icon={NotebookTabs}
+        />
         <StatCard
           label="Pending Services"
           value={stats.pendingServices}

@@ -19,7 +19,6 @@ import {
   Share2,
   ShieldCheck,
   Sparkles,
-  Users,
   X,
 } from "lucide-react"
 import { toast } from "sonner"
@@ -55,8 +54,8 @@ export default function BrowseServiceDetailsPage() {
 
   // Booking form state
   const [eventDate, setEventDate] = useState("")
-  const [guestCount, setGuestCount] = useState("")
-  const [notes, setNotes] = useState("")
+  const [eventLocation, setEventLocation] = useState("")
+  const [message, setMessage] = useState("")
   const [bookingSubmitting, setBookingSubmitting] = useState(false)
   const [bookedSuccess, setBookedSuccess] = useState(false)
 
@@ -87,9 +86,7 @@ export default function BrowseServiceDetailsPage() {
         // Pending, rejected, paused or inactive services stay hidden from the
         // public details page, not just the browse listing.
         if (!resolvedService || !isPublicService(resolvedService)) {
-          throw new Error(
-            "This wedding service is not available right now."
-          )
+          throw new Error("This wedding service is not available right now.")
         }
 
         if (isMounted) {
@@ -102,15 +99,22 @@ export default function BrowseServiceDetailsPage() {
 
         if (typeof rawVendor === "string") {
           vendorIdToFetch = rawVendor
-        } else if (rawVendor && typeof rawVendor === "object" && "_id" in rawVendor) {
+        } else if (
+          rawVendor &&
+          typeof rawVendor === "object" &&
+          "_id" in rawVendor
+        ) {
           vendorIdToFetch = String(rawVendor._id)
         }
 
         if (vendorIdToFetch) {
           try {
-            const vendorRes = await fetch(`${baseUrl}/users/${vendorIdToFetch}`, {
-              cache: "no-store",
-            })
+            const vendorRes = await fetch(
+              `${baseUrl}/users/${vendorIdToFetch}`,
+              {
+                cache: "no-store",
+              }
+            )
             if (vendorRes.ok) {
               const vendorJson = await vendorRes.json()
               const resolvedVendor = vendorJson?.data ?? vendorJson
@@ -120,7 +124,11 @@ export default function BrowseServiceDetailsPage() {
             }
           } catch {
             // Fallback gracefully if separate user endpoint call fails
-            if (isMounted && typeof rawVendor === "object" && rawVendor !== null) {
+            if (
+              isMounted &&
+              typeof rawVendor === "object" &&
+              rawVendor !== null
+            ) {
               setVendor(rawVendor as Vendor)
             }
           }
@@ -263,8 +271,18 @@ export default function BrowseServiceDetailsPage() {
       return
     }
 
+    if (!user.id) {
+      toast.error("We could not verify your account. Please sign in again.")
+      return
+    }
+
     if (!eventDate) {
       toast.error("Please select your wedding or event date.")
+      return
+    }
+
+    if (!eventLocation.trim()) {
+      toast.error("Please share where the event will take place.")
       return
     }
 
@@ -279,14 +297,10 @@ export default function BrowseServiceDetailsPage() {
         credentials: "include",
         body: JSON.stringify({
           serviceId: service._id,
-          vendorId:
-            typeof service.vendorId === "string"
-              ? service.vendorId
-              : vendor?._id,
+          customerId: user.id,
           eventDate,
-          guestCount: guestCount ? Number(guestCount) : undefined,
-          notes: notes.trim() || undefined,
-          totalPrice: service.price,
+          eventLocation: eventLocation.trim(),
+          message: message.trim() || undefined,
         }),
       })
 
@@ -437,7 +451,7 @@ export default function BrowseServiceDetailsPage() {
                         className={cn(
                           "relative aspect-[4/3] overflow-hidden rounded-2xl border-2 transition-all duration-200",
                           isSelected
-                            ? "border-[#B76E79] ring-2 ring-[#B76E79]/30 shadow-sm"
+                            ? "border-[#B76E79] shadow-sm ring-2 ring-[#B76E79]/30"
                             : "border-transparent opacity-70 hover:opacity-100"
                         )}
                       >
@@ -520,7 +534,7 @@ export default function BrowseServiceDetailsPage() {
 
               <div className="mt-5 flex flex-col justify-between gap-5 sm:flex-row sm:items-center">
                 <div className="flex items-center gap-4">
-                  <Avatar className="size-16 ring-2 ring-rose-200 shadow-xs">
+                  <Avatar className="size-16 shadow-xs ring-2 ring-rose-200">
                     {vendorImage ? (
                       <AvatarImage
                         src={vendorImage}
@@ -610,7 +624,7 @@ export default function BrowseServiceDetailsPage() {
                     </p>
                     <div className="flex flex-col gap-2 pt-2">
                       <Button
-                        render={<Link href="/dashboard/customer/my-bookings" />}
+                        render={<Link href="/customer/my-bookings" />}
                         className="w-full rounded-full bg-[#B76E79] text-white hover:bg-[#a25c67]"
                       >
                         View My Bookings
@@ -621,8 +635,8 @@ export default function BrowseServiceDetailsPage() {
                         onClick={() => {
                           setBookedSuccess(false)
                           setEventDate("")
-                          setGuestCount("")
-                          setNotes("")
+                          setEventLocation("")
+                          setMessage("")
                         }}
                         className="w-full rounded-full text-xs text-stone-600 hover:bg-rose-50"
                       >
@@ -652,42 +666,41 @@ export default function BrowseServiceDetailsPage() {
                       />
                     </div>
 
-                    {/* Estimated Guests Input */}
+                    {/* Event Location Input */}
                     <div className="space-y-1.5">
                       <Label
-                        htmlFor="guestCount"
+                        htmlFor="eventLocation"
                         className="flex items-center gap-1.5 text-xs font-semibold tracking-wide text-stone-700 uppercase"
                       >
-                        <Users className="size-3.5 text-[#B76E79]" />
-                        Estimated Guests (Optional)
+                        <MapPin className="size-3.5 text-[#B76E79]" />
+                        Event Location *
                       </Label>
                       <Input
-                        id="guestCount"
-                        type="number"
-                        min={1}
-                        max={5000}
-                        placeholder="e.g. 250"
-                        value={guestCount}
-                        onChange={(e) => setGuestCount(e.target.value)}
+                        id="eventLocation"
+                        type="text"
+                        required
+                        placeholder="e.g. Rosewood Lakeside, Dhaka"
+                        value={eventLocation}
+                        onChange={(e) => setEventLocation(e.target.value)}
                         className="h-11 rounded-xl border-rose-200/90 bg-[#FDFBF7]/60 text-stone-800 focus-visible:border-[#B76E79] focus-visible:ring-[#B76E79]/25"
                       />
                     </div>
 
-                    {/* Special Notes */}
+                    {/* Message for Vendor */}
                     <div className="space-y-1.5">
                       <Label
-                        htmlFor="notes"
+                        htmlFor="message"
                         className="flex items-center gap-1.5 text-xs font-semibold tracking-wide text-stone-700 uppercase"
                       >
                         <MessageSquare className="size-3.5 text-[#B76E79]" />
-                        Notes for Vendor (Optional)
+                        Message for Vendor (Optional)
                       </Label>
                       <Textarea
-                        id="notes"
+                        id="message"
                         rows={3}
-                        placeholder="Share your venue address, preferred theme, or special requests..."
-                        value={notes}
-                        onChange={(e) => setNotes(e.target.value)}
+                        placeholder="Tell the vendor about your guest count, theme or any special requests..."
+                        value={message}
+                        onChange={(e) => setMessage(e.target.value)}
                         className="resize-none rounded-xl border-rose-200/90 bg-[#FDFBF7]/60 text-sm text-stone-800 focus-visible:border-[#B76E79] focus-visible:ring-[#B76E79]/25"
                       />
                     </div>

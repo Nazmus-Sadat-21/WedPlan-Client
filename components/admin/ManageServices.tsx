@@ -104,7 +104,11 @@ function statusClasses(status: "pending" | "approved" | "rejected") {
   return "border-amber-200 bg-amber-50 text-amber-800 dark:border-amber-500/30 dark:bg-amber-500/10 dark:text-amber-300"
 }
 
-function StatusBadge({ status }: { status: "pending" | "approved" | "rejected" }) {
+function StatusBadge({
+  status,
+}: {
+  status: "pending" | "approved" | "rejected"
+}) {
   return (
     <span
       className={cn(
@@ -152,7 +156,7 @@ function ServiceMetric({
   return (
     <div
       className={cn(
-        "rounded-2xl border border-rose-200/70 bg-gradient-to-br p-4 shadow-2xs transition-shadow hover:shadow-md hover:shadow-rose-950/5 dark:border-input dark:from-input/20 dark:via-card dark:to-card sm:p-5",
+        "rounded-2xl border border-rose-200/70 bg-gradient-to-br p-4 shadow-2xs transition-shadow hover:shadow-md hover:shadow-rose-950/5 sm:p-5 dark:border-input dark:from-input/20 dark:via-card dark:to-card",
         tones[tone]
       )}
     >
@@ -560,7 +564,10 @@ export function ManageServices() {
             >
               <SelectTrigger
                 aria-label="Filter services by category"
-                className={cn(controlClassName, "w-full justify-between sm:w-[13rem]")}
+                className={cn(
+                  controlClassName,
+                  "w-full justify-between sm:w-[13rem]"
+                )}
               >
                 <SelectValue />
               </SelectTrigger>
@@ -583,7 +590,10 @@ export function ManageServices() {
             >
               <SelectTrigger
                 aria-label="Filter services by availability"
-                className={cn(controlClassName, "w-full justify-between sm:w-[12rem]")}
+                className={cn(
+                  controlClassName,
+                  "w-full justify-between sm:w-[12rem]"
+                )}
               >
                 <SelectValue />
               </SelectTrigger>
@@ -707,12 +717,13 @@ export function ManageServices() {
                               )}
                             />
                           </div>
-                          <div className="min-w-0 max-w-xs">
+                          <div className="max-w-xs min-w-0">
                             <p className="truncate font-heading font-semibold text-stone-900 dark:text-foreground">
                               {service.serviceName}
                             </p>
                             <p className="truncate text-xs text-stone-500 dark:text-muted-foreground">
-                              {service.description || "No description provided."}
+                              {service.description ||
+                                "No description provided."}
                             </p>
                             <p className="mt-0.5 text-[11px] text-stone-400 dark:text-muted-foreground">
                               Submitted {formatDate(service.createdAt)}
@@ -761,9 +772,7 @@ export function ManageServices() {
                               updateStatus(
                                 service,
                                 String(value) as
-                                  | "pending"
-                                  | "approved"
-                                  | "rejected"
+                                  "pending" | "approved" | "rejected"
                               )
                             }
                           >
@@ -779,7 +788,10 @@ export function ManageServices() {
                             </SelectTrigger>
                             <SelectContent>
                               {STATUS_OPTIONS.map((option) => (
-                                <SelectItem key={option.value} value={option.value}>
+                                <SelectItem
+                                  key={option.value}
+                                  value={option.value}
+                                >
                                   {option.label}
                                 </SelectItem>
                               ))}
@@ -819,7 +831,9 @@ export function ManageServices() {
                                 variant="outline"
                                 size="sm"
                                 disabled={isUpdating}
-                                onClick={() => updateStatus(service, "approved")}
+                                onClick={() =>
+                                  updateStatus(service, "approved")
+                                }
                                 title="Approve service"
                                 className="h-8 gap-1 rounded-lg border-emerald-200 bg-white text-xs text-emerald-700 hover:border-emerald-300 hover:bg-emerald-50 dark:border-input dark:bg-input/20 dark:hover:bg-emerald-500/10"
                               >
@@ -831,7 +845,9 @@ export function ManageServices() {
                                 variant="outline"
                                 size="sm"
                                 disabled={isUpdating}
-                                onClick={() => updateStatus(service, "rejected")}
+                                onClick={() =>
+                                  updateStatus(service, "rejected")
+                                }
                                 title="Reject service"
                                 className="h-8 gap-1 rounded-lg border-rose-200 bg-white text-xs text-rose-600 hover:border-rose-300 hover:bg-rose-50 hover:text-rose-700 dark:border-input dark:bg-input/20 dark:hover:bg-rose-500/10"
                               >
@@ -893,7 +909,7 @@ export function ManageServices() {
         open={Boolean(viewService)}
         onOpenChange={(open) => !open && setViewServiceId(null)}
       >
-        <DialogContent className="max-h-[90svh] overflow-y-auto rounded-3xl border-rose-200/80 bg-[#FDFBF7] p-0 dark:border-input dark:bg-card sm:max-w-2xl">
+        <DialogContent className="max-h-[90svh] overflow-y-auto rounded-3xl border-rose-200/80 bg-[#FDFBF7] p-0 sm:max-w-2xl dark:border-input dark:bg-card">
           {viewService ? (
             <>
               <div className="relative aspect-[16/9] w-full overflow-hidden bg-rose-100 dark:bg-input/30">
@@ -1076,7 +1092,7 @@ export function ManageServices() {
         open={Boolean(deleteTarget)}
         onOpenChange={(open) => !open && setDeleteTarget(null)}
       >
-        <DialogContent className="rounded-3xl border-rose-200/80 bg-[#FDFBF7] dark:border-input dark:bg-card sm:max-w-md">
+        <DialogContent className="rounded-3xl border-rose-200/80 bg-[#FDFBF7] sm:max-w-md dark:border-input dark:bg-card">
           <DialogHeader>
             <DialogTitle className="font-heading text-2xl font-semibold text-stone-900 dark:text-foreground">
               Delete this service?

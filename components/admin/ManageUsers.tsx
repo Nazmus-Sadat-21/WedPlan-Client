@@ -139,7 +139,7 @@ function Metric({
   return (
     <div
       className={cn(
-        "rounded-2xl border border-rose-200/70 bg-gradient-to-br p-4 shadow-2xs transition-shadow hover:shadow-md hover:shadow-rose-950/5 dark:border-input dark:from-input/20 dark:via-card dark:to-card sm:p-5",
+        "rounded-2xl border border-rose-200/70 bg-gradient-to-br p-4 shadow-2xs transition-shadow hover:shadow-md hover:shadow-rose-950/5 sm:p-5 dark:border-input dark:from-input/20 dark:via-card dark:to-card",
         tones[tone]
       )}
     >
@@ -288,8 +288,7 @@ export function ManageUsers() {
       const body = await res.json().catch(() => null)
       if (!res.ok) {
         throw new Error(
-          body?.message ??
-            `Could not ${block ? "block" : "unblock"} this user.`
+          body?.message ?? `Could not ${block ? "block" : "unblock"} this user.`
         )
       }
 
@@ -339,8 +338,8 @@ export function ManageUsers() {
             </h1>
             <p className="mt-2 max-w-xl text-sm leading-relaxed text-rose-100/80">
               Search the community, review account details and instantly block
-              or restore access. Blocked members cannot reach protected
-              platform features.
+              or restore access. Blocked members cannot reach protected platform
+              features.
             </p>
           </div>
 
@@ -428,7 +427,9 @@ export function ManageUsers() {
           <Select
             value={roleFilter}
             items={ROLE_OPTIONS}
-            onValueChange={(value) => setRoleFilter(String(value) as RoleFilter)}
+            onValueChange={(value) =>
+              setRoleFilter(String(value) as RoleFilter)
+            }
           >
             <SelectTrigger
               aria-label="Filter users by role"
@@ -554,7 +555,10 @@ export function ManageUsers() {
                         <div className="flex items-center gap-3.5">
                           <Avatar className="size-10 ring-2 ring-rose-100 dark:ring-input">
                             {user.image ? (
-                              <AvatarImage src={user.image} alt={user.name ?? ""} />
+                              <AvatarImage
+                                src={user.image}
+                                alt={user.name ?? ""}
+                              />
                             ) : null}
                             <AvatarFallback className="bg-gradient-to-br from-rose-100 to-rose-200/70 text-xs font-semibold text-[#9F5863]">
                               {getUserInitials(user.name)}
@@ -599,7 +603,7 @@ export function ManageUsers() {
                         </Badge>
                       </td>
 
-                      <td className="px-4 py-3.5 whitespace-nowrap text-xs text-stone-600 dark:text-muted-foreground">
+                      <td className="px-4 py-3.5 text-xs whitespace-nowrap text-stone-600 dark:text-muted-foreground">
                         <span className="inline-flex items-center gap-1.5">
                           <CalendarDays className="size-3.5 text-stone-400" />
                           {formatDate(user.createdAt)}
@@ -629,7 +633,9 @@ export function ManageUsers() {
                             size="sm"
                             disabled={isBusy || isAdmin}
                             title={
-                              isAdmin ? "Admin accounts cannot be blocked" : undefined
+                              isAdmin
+                                ? "Admin accounts cannot be blocked"
+                                : undefined
                             }
                             onClick={() =>
                               setConfirmTarget({ user, block: !blocked })
@@ -681,7 +687,7 @@ export function ManageUsers() {
         open={Boolean(viewUser)}
         onOpenChange={(open) => !open && setViewUserId(null)}
       >
-        <DialogContent className="max-h-[90svh] overflow-y-auto rounded-3xl border-rose-200/80 bg-[#FDFBF7] p-0 dark:border-input dark:bg-card sm:max-w-lg">
+        <DialogContent className="max-h-[90svh] overflow-y-auto rounded-3xl border-rose-200/80 bg-[#FDFBF7] p-0 sm:max-w-lg dark:border-input dark:bg-card">
           {viewUser ? (
             <>
               <div className="relative overflow-hidden bg-gradient-to-br from-[#332025] via-[#543138] to-[#9F5863] px-6 pt-7 pb-8 text-white">
@@ -738,7 +744,9 @@ export function ManageUsers() {
                     { label: "Email", value: viewUser.email ?? "—" },
                     {
                       label: "Email verified",
-                      value: viewUser.emailVerified ? "Verified" : "Not verified",
+                      value: viewUser.emailVerified
+                        ? "Verified"
+                        : "Not verified",
                     },
                     {
                       label: "Member since",
@@ -810,7 +818,7 @@ export function ManageUsers() {
         open={Boolean(confirmTarget)}
         onOpenChange={(open) => !open && setConfirmTarget(null)}
       >
-        <DialogContent className="rounded-3xl border-rose-200/80 bg-[#FDFBF7] dark:border-input dark:bg-card sm:max-w-md">
+        <DialogContent className="rounded-3xl border-rose-200/80 bg-[#FDFBF7] sm:max-w-md dark:border-input dark:bg-card">
           <DialogHeader>
             <DialogTitle className="font-heading text-2xl font-semibold text-stone-900 dark:text-foreground">
               {confirmTarget?.block ? "Block this account?" : "Restore access?"}

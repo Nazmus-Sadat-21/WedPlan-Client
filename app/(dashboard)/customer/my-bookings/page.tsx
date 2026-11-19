@@ -1,16 +1,17 @@
 import type { Metadata } from "next"
 
-import { ComingSoon } from "@/components/Shared/ComingSoon"
+import { MyBookings } from "@/components/customer/MyBookings"
 
-export const metadata: Metadata = { title: "My Bookings" }
+export const metadata: Metadata = {
+  title: "My Bookings | WedPlan",
+  description:
+    "Track every booking request you have sent, review vendor replies and cancel pending requests.",
+}
 
 export default function MyBookingsPage() {
   return (
-    <ComingSoon
-      title="My Bookings"
-      description="Track every booking request you have submitted and cancel pending ones."
-      backHref="/customer"
-      backLabel="Back to Overview"
-    />
+    <section className="mx-auto w-full max-w-7xl">
+      <MyBookings />
+    </section>
   )
 }
