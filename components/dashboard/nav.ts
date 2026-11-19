@@ -54,5 +54,10 @@ export const DASHBOARD_NAV: Record<string, NavItem[]> = {
     { href: "/admin/manage-users", label: "Manage Users", icon: UserRound },
     { href: "/admin/manage-services", label: "Manage Services", icon: Store },
     { href: "/admin/transactions", label: "Transactions", icon: HandCoins },
+     {
+      href: "/admin/profile-settings",
+      label: "Profile Settings",
+      icon: Settings,
+    },
   ],
 }

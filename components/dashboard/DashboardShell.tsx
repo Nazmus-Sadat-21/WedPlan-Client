@@ -239,7 +239,7 @@ export function DashboardShell({ children }: { children: React.ReactNode }) {
           </SheetContent>
         </Sheet>
         <span className="font-heading text-xl font-semibold text-stone-900 dark:text-foreground">
-          Wed<span className="text-[#B76E79] italic">Plan</span>
+          <span className="text-white">wed</span><span className="text-[#B76E79] italic">Plan</span>
         </span>
       </header>
 
