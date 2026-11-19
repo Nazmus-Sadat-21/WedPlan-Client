@@ -1,5 +1,5 @@
 import { API_ENDPOINTS } from "@/lib/constants"
-import type { Service, ServiceStatus } from "@/lib/types"
+import type { Service, ServiceAvailability, ServiceStatus } from "@/lib/types"
 
 export class ApiError extends Error {
   constructor(
@@ -69,13 +69,18 @@ export function fetchFeaturedServices(
   return fetchServices(options)
 }
 
+/** Legacy records store a boolean; newer ones store "active"/"inactive". */
+export function isServiceActive(service: Service): boolean {
+  return service.availability === true || service.availability === "active"
+}
+
 /** Only approved and available services should appear publicly. */
 export function isPublicService(service: Service): boolean {
   const status = String(service.status ?? "approved").toLowerCase()
 
   if (status === "rejected" || status === "pending") return false
 
-  return service.availability !== false
+  return isServiceActive(service)
 }
 
 /** Services belonging to one vendor (includes pending/rejected services). */
@@ -135,7 +140,7 @@ export interface NewServiceInput {
   images: string[]
   /** Services created from the vendor form start pending until an admin reviews them. */
   status: ServiceStatus
-  availability: boolean
+  availability: ServiceAvailability
   createdAt: string
 }
 

@@ -43,7 +43,7 @@ import {
 } from "@/components/ui/select"
 import { Skeleton } from "@/components/ui/skeleton"
 import { Textarea } from "@/components/ui/textarea"
-import { createService, fetchVendorServices } from "@/lib/api"
+import { createService, fetchVendorServices, isServiceActive } from "@/lib/api"
 import { useSession } from "@/lib/auth-client"
 import {
   CATEGORY_IMAGES,
@@ -183,7 +183,7 @@ function SubmittedServiceCard({ service }: { service: Service }) {
             {formatPrice(service.price)}
           </span>
           <span>Submitted {formatDate(service.createdAt)}</span>
-          {service.status === "approved" && service.availability === false ? (
+          {service.status === "approved" && !isServiceActive(service) ? (
             <span className="text-amber-600 dark:text-amber-400">
               Hidden from customers
             </span>
@@ -259,7 +259,7 @@ export function AddServiceForm() {
     () =>
       myServices.filter(
         (service) =>
-          service.status === "approved" && service.availability !== false
+          service.status === "approved" && isServiceActive(service)
       ).length,
     [myServices]
   )
@@ -377,7 +377,7 @@ export function AddServiceForm() {
         location: location.trim(),
         images: imageUrls,
         status: "pending",
-        availability: true,
+        availability: "active",
         createdAt: new Date().toISOString(),
       })
 

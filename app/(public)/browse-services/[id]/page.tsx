@@ -32,6 +32,7 @@ import { Label } from "@/components/ui/label"
 import { Skeleton } from "@/components/ui/skeleton"
 import { Textarea } from "@/components/ui/textarea"
 import { useSession } from "@/lib/auth-client"
+import { isPublicService } from "@/lib/api"
 import { CATEGORY_IMAGES } from "@/lib/constants"
 import { formatPrice, getUserInitials } from "@/lib/format"
 import type { Service, Vendor } from "@/lib/types"
@@ -82,6 +83,14 @@ export default function BrowseServiceDetailsPage() {
 
         const json = await res.json()
         const resolvedService: Service = json?.data ?? json
+
+        // Pending, rejected, paused or inactive services stay hidden from the
+        // public details page, not just the browse listing.
+        if (!resolvedService || !isPublicService(resolvedService)) {
+          throw new Error(
+            "This wedding service is not available right now."
+          )
+        }
 
         if (isMounted) {
           setService(resolvedService)
@@ -182,10 +191,10 @@ export default function BrowseServiceDetailsPage() {
               "The wedding service you are looking for may have been removed or is temporarily unavailable."}
           </p>
           <Button
-            asChild
+            render={<Link href="/browse-services" />}
             className="rounded-full bg-[#B76E79] px-6 text-white hover:bg-[#a25c67]"
           >
-            <Link href="/browse-services">Back to Browse Services</Link>
+            Back to Browse Services
           </Button>
         </div>
       </main>
@@ -230,6 +239,11 @@ export default function BrowseServiceDetailsPage() {
 
   async function handleBookingSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault()
+
+    if (!service) {
+      toast.error("This service is no longer available.")
+      return
+    }
 
     if (!user) {
       toast.info("Please sign in as a customer to request a booking.")
@@ -589,12 +603,10 @@ export default function BrowseServiceDetailsPage() {
                     </p>
                     <div className="flex flex-col gap-2 pt-2">
                       <Button
-                        asChild
+                        render={<Link href="/dashboard/customer/my-bookings" />}
                         className="w-full rounded-full bg-[#B76E79] text-white hover:bg-[#a25c67]"
                       >
-                        <Link href="/dashboard/customer/my-bookings">
-                          View My Bookings
-                        </Link>
+                        View My Bookings
                       </Button>
                       <Button
                         type="button"
@@ -700,10 +712,10 @@ export default function BrowseServiceDetailsPage() {
                       <div className="space-y-2.5 pt-1">
                         <Button
                           type="button"
-                          asChild
+                          render={<Link href="/sign-in" />}
                           className="h-12 w-full rounded-full bg-[#B76E79] text-base font-medium text-white shadow-md shadow-rose-900/10 hover:bg-[#a25c67]"
                         >
-                          <Link href="/sign-in">Sign In to Book Service</Link>
+                          Sign In to Book Service
                         </Button>
                         <p className="text-center text-xs text-stone-500">
                           You won&apos;t be charged until the vendor confirms

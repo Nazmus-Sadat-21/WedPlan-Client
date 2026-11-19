@@ -14,7 +14,7 @@ const services: NewServiceInput[] = [
       "https://images.unsplash.com/photo-1519741497674-611481863552?auto=format&fit=crop&w=1200&q=80",
     ],
     status: "approved",
-    availability: true,
+    availability: "active",
     createdAt: new Date().toISOString(),
   },
   {
@@ -29,7 +29,7 @@ const services: NewServiceInput[] = [
       "https://images.unsplash.com/photo-1519167758481-83f550bb49b3?auto=format&fit=crop&w=1200&q=80",
     ],
     status: "approved",
-    availability: true,
+    availability: "active",
     createdAt: new Date().toISOString(),
   },
   {
@@ -44,7 +44,7 @@ const services: NewServiceInput[] = [
       "https://images.unsplash.com/photo-1464366400600-7168b8af9bc3?auto=format&fit=crop&w=1200&q=80",
     ],
     status: "approved",
-    availability: true,
+    availability: "active",
     createdAt: new Date().toISOString(),
   },
   {
@@ -59,7 +59,7 @@ const services: NewServiceInput[] = [
       "https://images.unsplash.com/photo-1414235077428-338989a2e8c0?auto=format&fit=crop&w=1200&q=80",
     ],
     status: "approved",
-    availability: true,
+    availability: "active",
     createdAt: new Date().toISOString(),
   },
   {
@@ -74,7 +74,7 @@ const services: NewServiceInput[] = [
       "https://images.unsplash.com/photo-1487412947147-5cebf100ffc2?auto=format&fit=crop&w=1200&q=80",
     ],
     status: "approved",
-    availability: true,
+    availability: "active",
     createdAt: new Date().toISOString(),
   },
 ]

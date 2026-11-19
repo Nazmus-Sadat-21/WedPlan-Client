@@ -43,6 +43,7 @@ import { Label } from "@/components/ui/label"
 import { Skeleton } from "@/components/ui/skeleton"
 import { Textarea } from "@/components/ui/textarea"
 import { useSession } from "@/lib/auth-client"
+import { isServiceActive } from "@/lib/api"
 import {
   API_ENDPOINTS,
   CATEGORY_IMAGES,
@@ -79,7 +80,7 @@ function getApprovalStatus(service: Service): "approved" | "pending" | "rejected
 
 function isServiceAvailable(service: Service): boolean {
   if (getApprovalStatus(service) === "rejected") return false
-  return service.availability !== false
+  return isServiceActive(service)
 }
 
 function resolveServiceVendorId(service: Service): string | null {
@@ -256,6 +257,12 @@ export function ManageService() {
 
     const currentAvail = isServiceAvailable(service)
     const nextAvail = !currentAvail
+    const nextAvailability = nextAvail ? "active" : "inactive"
+
+    if (!userId) {
+      toast.error("Your session expired. Please sign in again.")
+      return
+    }
 
     setTogglingId(service._id)
     try {
@@ -263,7 +270,10 @@ export function ManageService() {
         method: "PATCH",
         headers: { "Content-Type": "application/json" },
         credentials: "include",
-        body: JSON.stringify({ availability: nextAvail }),
+        body: JSON.stringify({
+          vendorId: userId,
+          availability: nextAvailability,
+        }),
       })
 
       if (!res.ok) {
@@ -274,7 +284,7 @@ export function ManageService() {
       setServices((prev) =>
         prev.map((item) =>
           item._id === service._id
-            ? { ...item, availability: nextAvail }
+            ? { ...item, availability: nextAvailability }
             : item
         )
       )
@@ -316,16 +326,22 @@ export function ManageService() {
     const enforcedAvailability =
       status === "rejected" ? false : editForm.availability
 
+    if (!userId) {
+      toast.error("Your session expired. Please sign in again.")
+      return
+    }
+
     setSavingEdit(true)
     try {
       const payload = {
+        vendorId: userId,
         serviceName: editForm.serviceName.trim(),
         category: editForm.category,
         price: parsedPrice,
         location: editForm.location.trim(),
         description: editForm.description.trim(),
         images: parsedImages,
-        availability: enforcedAvailability,
+        availability: enforcedAvailability ? "active" : "inactive",
       }
 
       const res = await fetch(API_ENDPOINTS.serviceById(editService._id), {
@@ -365,12 +381,20 @@ export function ManageService() {
   async function handleConfirmDelete() {
     if (!deleteTarget) return
 
+    if (!userId) {
+      toast.error("Your session expired. Please sign in again.")
+      return
+    }
+
     setDeleting(true)
     try {
-      const res = await fetch(API_ENDPOINTS.serviceById(deleteTarget._id), {
-        method: "DELETE",
-        credentials: "include",
-      })
+      const res = await fetch(
+        `${API_ENDPOINTS.serviceById(deleteTarget._id)}?vendorId=${encodeURIComponent(userId)}`,
+        {
+          method: "DELETE",
+          credentials: "include",
+        }
+      )
 
       if (!res.ok) {
         const body = await res.json().catch(() => null)

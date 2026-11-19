@@ -1,10 +1,13 @@
 export type ServiceStatus = "pending" | "approved" | "rejected"
 
+export type ServiceAvailability = boolean | "active" | "inactive"
+
 export type BookingStatus = "pending" | "accepted" | "rejected" | "cancelled"
 
 export interface Vendor {
   _id: string
   name: string
+  email?: string | null
   image?: string | null
   businessName?: string
 }
@@ -18,7 +21,7 @@ export interface Service {
   location: string
   images?: string[] | null
   status: ServiceStatus | string
-  availability?: boolean
+  availability?: ServiceAvailability
   createdAt?: string
   /** The Express API may return the vendor populated or as a raw id. */
   vendor?: Vendor
