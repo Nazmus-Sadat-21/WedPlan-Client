@@ -3,7 +3,15 @@
 import { useEffect, useMemo, useRef, useState } from "react"
 import Link from "next/link"
 import { useRouter } from "next/navigation"
-import { Heart, LoaderCircle, ImagePlus, Store, UserRound } from "lucide-react"
+import {
+  Eye,
+  EyeOff,
+  Heart,
+  LoaderCircle,
+  ImagePlus,
+  Store,
+  UserRound,
+} from "lucide-react"
 import { toast } from "sonner"
 
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
@@ -51,6 +59,9 @@ export function SignUpForm() {
   const [fullName, setFullName] = useState("")
   const [email, setEmail] = useState("")
   const [password, setPassword] = useState("")
+  const [confirmPassword, setConfirmPassword] = useState("")
+  const [showConfirm, setShowConfirm] = useState(false)
+  const [confirmTouched, setConfirmTouched] = useState(false)
   const [role, setRole] = useState<SignupRole>("customer")
   const [businessName, setBusinessName] = useState("")
   const [imageFile, setImageFile] = useState<File | null>(null)
@@ -79,6 +90,17 @@ export function SignUpForm() {
       return "Min 6 characters with one uppercase and one lowercase letter."
     return undefined
   }, [password])
+
+  // Live re-enter password validation (updates when either field changes).
+  const confirmError =
+    confirmTouched || confirmPassword !== ""
+      ? confirmPassword === ""
+        ? "Please re-enter your password."
+        : confirmPassword !== password
+          ? "Passwords do not match."
+          : null
+      : null
+  const passwordsMatch = confirmPassword !== "" && confirmPassword === password
 
   function handleImageChange(event: React.ChangeEvent<HTMLInputElement>) {
     const file = event.target.files?.[0]
@@ -116,8 +138,15 @@ export function SignUpForm() {
       password: validatePassword(password),
     }
     setFieldErrors(errors)
+    setConfirmTouched(true)
 
-    if (errors.fullName || errors.email || errors.password) {
+    if (
+      errors.fullName ||
+      errors.email ||
+      errors.password ||
+      confirmPassword === "" ||
+      confirmPassword !== password
+    ) {
       toast.error("Please fix the highlighted fields.")
       return
     }
@@ -284,6 +313,41 @@ export function SignUpForm() {
         }
         autoComplete="new-password"
       />
+
+      {/* Re-enter password */}
+      <div className="space-y-1.5">
+        <Label htmlFor="signup-confirm-password">Re-enter password</Label>
+        <div className="relative">
+          <Input
+            id="signup-confirm-password"
+            type={showConfirm ? "text" : "password"}
+            value={confirmPassword}
+            onChange={(event) => setConfirmPassword(event.target.value)}
+            onBlur={() => setConfirmTouched(true)}
+            placeholder="Re-enter your password"
+            autoComplete="new-password"
+            aria-invalid={Boolean(confirmError)}
+            className={cn(authControlClassName, "pr-10")}
+          />
+          <button
+            type="button"
+            onClick={() => setShowConfirm((value) => !value)}
+            aria-label={showConfirm ? "Hide password" : "Show password"}
+            className="absolute top-1/2 right-3 -translate-y-1/2 text-muted-foreground transition-colors hover:text-foreground"
+          >
+            {showConfirm ? (
+              <EyeOff className="size-4" />
+            ) : (
+              <Eye className="size-4" />
+            )}
+          </button>
+        </div>
+        {confirmError ? (
+          <p className="text-xs text-destructive">{confirmError}</p>
+        ) : passwordsMatch ? (
+          <p className="text-xs text-emerald-600">Passwords match.</p>
+        ) : null}
+      </div>
 
       {/* Profile image (optional, uploaded to ImgBB) */}
       <div className="space-y-1.5">
