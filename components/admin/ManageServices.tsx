@@ -5,12 +5,10 @@ import Image from "next/image"
 import {
   AlertCircle,
   BadgeCheck,
-  Check,
   Clock,
   Eye,
   Filter,
   ImagePlus,
-  LoaderCircle,
   MapPin,
   PauseCircle,
   RotateCcw,
@@ -22,7 +20,6 @@ import {
   UsersRound,
   Wallet,
   X,
-  XCircle,
 } from "lucide-react"
 import { toast } from "sonner"
 
@@ -73,9 +70,6 @@ const AVAILABILITY_OPTIONS = [
 const controlClassName =
   "h-10 border-rose-200/90 bg-white/85 text-sm focus-visible:border-[#B76E79] focus-visible:ring-[3px] focus-visible:ring-[#B76E79]/25 dark:border-input dark:bg-input/20 dark:focus-visible:border-champagne-400 dark:focus-visible:ring-champagne-400/30"
 
-const focusRingClassName =
-  "outline-none focus-visible:border-[#B76E79] focus-visible:ring-[3px] focus-visible:ring-[#B76E79]/25 dark:focus-visible:border-champagne-400 dark:focus-visible:ring-champagne-400/30"
-
 function getStatus(service: Service): "pending" | "approved" | "rejected" {
   const raw = String(service.status ?? "pending").toLowerCase()
   if (raw === "approved") return "approved"
@@ -102,34 +96,6 @@ function statusClasses(status: "pending" | "approved" | "rejected") {
     return "border-rose-200 bg-rose-50 text-rose-800 dark:border-rose-500/30 dark:bg-rose-500/10 dark:text-rose-300"
   }
   return "border-amber-200 bg-amber-50 text-amber-800 dark:border-amber-500/30 dark:bg-amber-500/10 dark:text-amber-300"
-}
-
-function StatusBadge({
-  status,
-}: {
-  status: "pending" | "approved" | "rejected"
-}) {
-  return (
-    <span
-      className={cn(
-        "inline-flex items-center gap-1.5 rounded-full border px-2.5 py-1 text-[11px] font-semibold",
-        statusClasses(status)
-      )}
-    >
-      {status === "approved" ? (
-        <BadgeCheck className="size-3.5" />
-      ) : status === "rejected" ? (
-        <ShieldAlert className="size-3.5" />
-      ) : (
-        <Clock className="size-3.5" />
-      )}
-      {status === "approved"
-        ? "Approved"
-        : status === "rejected"
-          ? "Rejected"
-          : "Pending"}
-    </span>
-  )
 }
 
 function ServiceMetric({
@@ -222,7 +188,6 @@ export function ManageServices() {
             ? servicesJson.data
             : []
 
-        // Vendor names are a nice-to-have; never let this block the table.
         let userList: AdminUser[] = []
         try {
           const usersRes = await fetch(API_ENDPOINTS.users, {
@@ -665,7 +630,7 @@ export function ManageServices() {
       ) : (
         <div className="overflow-hidden rounded-3xl border border-rose-200/80 bg-white/90 shadow-xs dark:border-input dark:bg-card/90">
           <div className="overflow-x-auto">
-            <table className="w-full min-w-[1060px] text-left text-sm">
+            <table className="w-full min-w-[1020px] text-left text-sm">
               <thead className="bg-gradient-to-r from-[#332025] via-[#543138] to-[#332025] text-[10px] font-semibold tracking-[0.16em] text-rose-100 uppercase">
                 <tr>
                   <th className="py-4 pr-4 pl-6">Service</th>
@@ -764,43 +729,38 @@ export function ManageServices() {
                       </td>
 
                       <td className="px-4 py-3.5">
-                        <div className="flex items-center gap-2">
-                          <Select
-                            value={status}
-                            items={STATUS_OPTIONS}
-                            onValueChange={(value) =>
-                              updateStatus(
-                                service,
-                                String(value) as
-                                  "pending" | "approved" | "rejected"
-                              )
-                            }
+                        <Select
+                          value={status}
+                          items={STATUS_OPTIONS}
+                          onValueChange={(value) =>
+                            updateStatus(
+                              service,
+                              String(value) as
+                                "pending" | "approved" | "rejected"
+                            )
+                          }
+                        >
+                          <SelectTrigger
+                            aria-label={`Change status for ${service.serviceName}`}
+                            disabled={isUpdating}
+                            className={cn(
+                              "h-8 w-[9.5rem] justify-between rounded-full border px-2.5 text-[11px] font-semibold",
+                              statusClasses(status)
+                            )}
                           >
-                            <SelectTrigger
-                              aria-label={`Change status for ${service.serviceName}`}
-                              disabled={isUpdating}
-                              className={cn(
-                                "h-8 w-[9.5rem] justify-between rounded-full border px-2.5 text-[11px] font-semibold",
-                                statusClasses(status)
-                              )}
-                            >
-                              <SelectValue />
-                            </SelectTrigger>
-                            <SelectContent>
-                              {STATUS_OPTIONS.map((option) => (
-                                <SelectItem
-                                  key={option.value}
-                                  value={option.value}
-                                >
-                                  {option.label}
-                                </SelectItem>
-                              ))}
-                            </SelectContent>
-                          </Select>
-                          {isUpdating ? (
-                            <LoaderCircle className="size-3.5 animate-spin text-[#B76E79]" />
-                          ) : null}
-                        </div>
+                            <SelectValue />
+                          </SelectTrigger>
+                          <SelectContent>
+                            {STATUS_OPTIONS.map((option) => (
+                              <SelectItem
+                                key={option.value}
+                                value={option.value}
+                              >
+                                {option.label}
+                              </SelectItem>
+                            ))}
+                          </SelectContent>
+                        </Select>
                       </td>
 
                       <td className="px-4 py-3.5">
@@ -824,47 +784,14 @@ export function ManageServices() {
 
                       <td className="py-3.5 pr-6 pl-4">
                         <div className="flex items-center justify-end gap-1.5">
-                          {status === "pending" ? (
-                            <>
-                              <Button
-                                type="button"
-                                variant="outline"
-                                size="sm"
-                                disabled={isUpdating}
-                                onClick={() =>
-                                  updateStatus(service, "approved")
-                                }
-                                title="Approve service"
-                                className="h-8 gap-1 rounded-lg border-emerald-200 bg-white text-xs text-emerald-700 hover:border-emerald-300 hover:bg-emerald-50 dark:border-input dark:bg-input/20 dark:hover:bg-emerald-500/10"
-                              >
-                                <Check className="size-3.5" />
-                                Approve
-                              </Button>
-                              <Button
-                                type="button"
-                                variant="outline"
-                                size="sm"
-                                disabled={isUpdating}
-                                onClick={() =>
-                                  updateStatus(service, "rejected")
-                                }
-                                title="Reject service"
-                                className="h-8 gap-1 rounded-lg border-rose-200 bg-white text-xs text-rose-600 hover:border-rose-300 hover:bg-rose-50 hover:text-rose-700 dark:border-input dark:bg-input/20 dark:hover:bg-rose-500/10"
-                              >
-                                <XCircle className="size-3.5" />
-                                Reject
-                              </Button>
-                            </>
-                          ) : null}
-
                           <Button
                             type="button"
                             variant="outline"
                             size="sm"
                             onClick={() => setViewServiceId(service._id)}
-                            className="h-8 gap-1 rounded-lg border-rose-200/80 bg-white text-xs text-stone-700 hover:bg-rose-50 dark:border-input dark:bg-input/20 dark:text-foreground dark:hover:bg-input/50"
+                            className="h-8 gap-1.5 rounded-lg border-rose-200/80 bg-white px-2.5 text-xs text-stone-700 hover:bg-rose-50 dark:border-input dark:bg-input/20 dark:text-foreground dark:hover:bg-input/50"
                           >
-                            <Eye className="size-3.5 text-[#B76E79]" />
+                            <Eye className="size-3.5 text-stone-400" />
                             View
                           </Button>
 
@@ -873,8 +800,7 @@ export function ManageServices() {
                             variant="outline"
                             size="sm"
                             onClick={() => setDeleteTarget(service)}
-                            title="Delete service"
-                            className="h-8 gap-1 rounded-lg border-rose-200/80 bg-white text-xs text-rose-600 hover:border-rose-300 hover:bg-rose-50 hover:text-rose-700 dark:border-input dark:bg-input/20 dark:hover:bg-rose-500/10"
+                            className="h-8 gap-1.5 rounded-lg border-rose-200/80 bg-white px-2.5 text-xs text-rose-600 hover:border-rose-300 hover:bg-rose-50 hover:text-rose-700 dark:border-input dark:bg-input/20 dark:hover:bg-rose-500/10"
                           >
                             <Trash2 className="size-3.5" />
                             Delete
@@ -887,24 +813,10 @@ export function ManageServices() {
               </tbody>
             </table>
           </div>
-
-          <div className="flex flex-col gap-1 border-t border-rose-100 bg-rose-50/40 px-6 py-3 text-xs text-stone-500 sm:flex-row sm:items-center sm:justify-between dark:border-input dark:bg-input/20 dark:text-muted-foreground">
-            <span>
-              Showing{" "}
-              <span className="font-semibold text-stone-700 dark:text-foreground">
-                {filteredServices.length}
-              </span>{" "}
-              of {services.length} submitted services
-            </span>
-            <span className="inline-flex items-center gap-1.5">
-              <BadgeCheck className="size-3.5 text-emerald-600" />
-              Public catalogue shows approved + active services only.
-            </span>
-          </div>
         </div>
       )}
 
-      {/* Service details dialog */}
+      {/* Service detail dialog */}
       <Dialog
         open={Boolean(viewService)}
         onOpenChange={(open) => !open && setViewServiceId(null)}
@@ -927,19 +839,13 @@ export function ManageServices() {
                 />
                 <div className="absolute inset-0 bg-gradient-to-t from-stone-950/80 via-stone-950/25 to-transparent" />
                 <div className="absolute right-6 bottom-5 left-6 flex flex-wrap items-end justify-between gap-3">
-                  <div className="min-w-0">
-                    <div className="mb-2 flex flex-wrap items-center gap-2">
-                      <Badge className="border-white/40 bg-white/90 text-xs font-semibold text-[#9F5863] dark:bg-input/80 dark:text-champagne-400">
-                        {viewService.category}
-                      </Badge>
-                      <StatusBadge status={getStatus(viewService)} />
-                    </div>
+                  <div>
+                    <Badge className="mb-2 border-white/40 bg-white/90 text-xs font-semibold text-[#9F5863] dark:bg-input/80 dark:text-champagne-400">
+                      {viewService.category}
+                    </Badge>
                     <DialogTitle className="font-heading text-2xl font-semibold text-white sm:text-3xl">
                       {viewService.serviceName}
                     </DialogTitle>
-                    <DialogDescription className="mt-1 text-sm text-rose-100/80">
-                      Submitted {formatDate(viewService.createdAt, "long")}
-                    </DialogDescription>
                   </div>
                   <span className="rounded-2xl bg-white/95 px-4 py-1.5 font-heading text-xl font-bold text-stone-900 shadow-md dark:bg-card dark:text-foreground">
                     {formatPrice(viewService.price)}
@@ -948,32 +854,70 @@ export function ManageServices() {
               </div>
 
               <div className="space-y-5 p-6 sm:p-7">
-                <div className="grid gap-3 sm:grid-cols-2">
-                  <div className="flex items-center gap-2 rounded-2xl border border-rose-200/75 bg-white p-3.5 text-sm dark:border-input dark:bg-input/20">
-                    <MapPin className="size-4 shrink-0 text-[#B76E79]" />
-                    <span className="font-medium text-stone-800 dark:text-foreground">
+                <DialogDescription className="sr-only">
+                  Submitted service details for {viewService.serviceName}
+                </DialogDescription>
+
+                <div className="flex flex-wrap items-center justify-between gap-3 rounded-2xl border border-rose-200/75 bg-white p-4 dark:border-input dark:bg-input/20">
+                  <div className="flex items-center gap-3">
+                    <div className="flex size-10 items-center justify-center rounded-full bg-rose-50 text-[#B76E79] dark:bg-input/40 dark:text-champagne-400">
+                      <UsersRound className="size-4.5" />
+                    </div>
+                    <div>
+                      <p className="text-sm font-semibold text-stone-900 dark:text-foreground">
+                        {usersById.get(resolveVendorId(viewService) ?? "")
+                          ?.name ?? "Unknown vendor"}
+                      </p>
+                      <p className="text-xs text-stone-500 dark:text-muted-foreground">
+                        {usersById.get(resolveVendorId(viewService) ?? "")
+                          ?.email ??
+                          resolveVendorId(viewService) ??
+                          "—"}
+                      </p>
+                    </div>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <span className="flex items-center gap-1 text-xs text-stone-500 dark:text-muted-foreground">
+                      <MapPin className="size-3.5 text-[#B76E79]" />
                       {viewService.location}
                     </span>
-                  </div>
-                  <div className="flex items-center gap-2 rounded-2xl border border-rose-200/75 bg-white p-3.5 text-sm dark:border-input dark:bg-input/20">
-                    <UsersRound className="size-4 shrink-0 text-[#B76E79]" />
-                    <span className="truncate font-medium text-stone-800 dark:text-foreground">
-                      {(() => {
-                        const id = resolveVendorId(viewService)
-                        return id
-                          ? (usersById.get(id)?.name ?? id)
-                          : "Unknown vendor"
-                      })()}
-                    </span>
+                    <Select
+                      value={getStatus(viewService)}
+                      items={STATUS_OPTIONS}
+                      onValueChange={(value) =>
+                        updateStatus(
+                          viewService,
+                          String(value) as
+                            "pending" | "approved" | "rejected"
+                        )
+                      }
+                    >
+                      <SelectTrigger
+                        aria-label="Change service status"
+                        disabled={updatingId === viewService._id}
+                        className={cn(
+                          "h-8 w-[9.5rem] justify-between rounded-full border px-2.5 text-[11px] font-semibold",
+                          statusClasses(getStatus(viewService))
+                        )}
+                      >
+                        <SelectValue />
+                      </SelectTrigger>
+                      <SelectContent>
+                        {STATUS_OPTIONS.map((option) => (
+                          <SelectItem key={option.value} value={option.value}>
+                            {option.label}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
                   </div>
                 </div>
 
                 <div className="space-y-2 rounded-2xl border border-rose-200/75 bg-white p-5 dark:border-input dark:bg-input/20">
-                  <h4 className="flex items-center gap-1.5 text-xs font-semibold tracking-wider text-stone-400 uppercase dark:text-muted-foreground">
-                    <ImagePlus className="size-3.5 text-[#B76E79]" />
+                  <h4 className="text-xs font-semibold tracking-wider text-stone-400 uppercase dark:text-muted-foreground">
                     Package description
                   </h4>
-                  <p className="text-sm leading-relaxed whitespace-pre-line text-stone-700 dark:text-foreground">
+                  <p className="text-sm leading-relaxed whitespace-pre-line text-stone-700 dark:text-foreground/90">
                     {viewService.description || "No description provided."}
                   </p>
                 </div>
@@ -981,10 +925,11 @@ export function ManageServices() {
                 {Array.isArray(viewService.images) &&
                 viewService.images.length > 1 ? (
                   <div className="space-y-2">
-                    <h4 className="text-xs font-semibold tracking-wider text-stone-400 uppercase dark:text-muted-foreground">
-                      Gallery ({viewService.images.length} photos)
+                    <h4 className="flex items-center gap-1.5 text-xs font-semibold tracking-wider text-stone-400 uppercase dark:text-muted-foreground">
+                      <ImagePlus className="size-3.5" />
+                      All photos ({viewService.images.length})
                     </h4>
-                    <div className="grid grid-cols-4 gap-2.5">
+                    <div className="grid grid-cols-3 gap-2.5 sm:grid-cols-4">
                       {viewService.images.map((url, index) => (
                         <div
                           key={`${url}-${index}`}
@@ -992,7 +937,7 @@ export function ManageServices() {
                         >
                           <Image
                             src={url}
-                            alt={`Gallery ${index + 1}`}
+                            alt={`${viewService.serviceName} photo ${index + 1}`}
                             fill
                             sizes="150px"
                             className="object-cover"
@@ -1003,57 +948,7 @@ export function ManageServices() {
                   </div>
                 ) : null}
 
-                <div className="rounded-2xl border border-rose-200/75 bg-white p-4 dark:border-input dark:bg-input/20">
-                  <p className="mb-2 text-xs font-semibold tracking-wider text-stone-400 uppercase dark:text-muted-foreground">
-                    Review decision
-                  </p>
-                  <div className="flex flex-wrap items-center gap-2">
-                    <Button
-                      type="button"
-                      disabled={updatingId === viewService._id}
-                      onClick={() => updateStatus(viewService, "approved")}
-                      className={cn(
-                        "gap-1.5 rounded-full bg-emerald-600 text-white hover:bg-emerald-700",
-                        focusRingClassName
-                      )}
-                    >
-                      <Check className="size-4" />
-                      Approve
-                    </Button>
-                    <Button
-                      type="button"
-                      disabled={updatingId === viewService._id}
-                      onClick={() => updateStatus(viewService, "rejected")}
-                      variant="outline"
-                      className={cn(
-                        "gap-1.5 rounded-full border-rose-200 text-rose-600 hover:bg-rose-50 dark:border-input dark:hover:bg-rose-500/10",
-                        focusRingClassName
-                      )}
-                    >
-                      <XCircle className="size-4" />
-                      Reject
-                    </Button>
-                    <Button
-                      type="button"
-                      disabled={updatingId === viewService._id}
-                      onClick={() => updateStatus(viewService, "pending")}
-                      variant="outline"
-                      className={cn(
-                        "gap-1.5 rounded-full border-amber-200 text-amber-700 hover:bg-amber-50 dark:border-input dark:hover:bg-amber-500/10",
-                        focusRingClassName
-                      )}
-                    >
-                      <Clock className="size-4" />
-                      Send to review
-                    </Button>
-                  </div>
-                  <p className="mt-2 text-[11px] text-stone-500 dark:text-muted-foreground">
-                    Availability is controlled by the vendor. A service appears
-                    publicly only when approved and active.
-                  </p>
-                </div>
-
-                <DialogFooter className="gap-2 pt-1 sm:justify-between">
+                <DialogFooter className="gap-2 pt-2 sm:justify-between">
                   <Button
                     type="button"
                     variant="outline"
@@ -1062,23 +957,17 @@ export function ManageServices() {
                       setViewServiceId(null)
                       setDeleteTarget(target)
                     }}
-                    className={cn(
-                      "gap-1.5 rounded-full border-rose-200 text-rose-600 hover:bg-rose-50 dark:border-input dark:hover:bg-rose-500/10",
-                      focusRingClassName
-                    )}
+                    className="gap-1.5 rounded-full border-rose-200 text-rose-600 hover:bg-rose-50 dark:border-input dark:hover:bg-rose-500/10"
                   >
-                    <Trash2 className="size-4" />
+                    <Trash2 className="size-3.5" />
                     Delete service
                   </Button>
                   <Button
                     type="button"
                     onClick={() => setViewServiceId(null)}
-                    className={cn(
-                      "rounded-full bg-[#B76E79] text-[#fffdf8] hover:bg-[#a25c67]",
-                      focusRingClassName
-                    )}
+                    className="rounded-full bg-[#B76E79] px-6 text-[#fffdf8] hover:bg-[#a25c67]"
                   >
-                    Close
+                    Done
                   </Button>
                 </DialogFooter>
               </div>
@@ -1087,7 +976,7 @@ export function ManageServices() {
         </DialogContent>
       </Dialog>
 
-      {/* Delete confirmation */}
+      {/* Delete confirmation dialog */}
       <Dialog
         open={Boolean(deleteTarget)}
         onOpenChange={(open) => !open && setDeleteTarget(null)}
@@ -1095,45 +984,35 @@ export function ManageServices() {
         <DialogContent className="rounded-3xl border-rose-200/80 bg-[#FDFBF7] sm:max-w-md dark:border-input dark:bg-card">
           <DialogHeader>
             <DialogTitle className="font-heading text-2xl font-semibold text-stone-900 dark:text-foreground">
-              Delete this service?
+              Delete service permanently?
             </DialogTitle>
             <DialogDescription className="text-stone-600 dark:text-muted-foreground">
+              This removes{" "}
               <span className="font-semibold text-stone-900 dark:text-foreground">
                 {deleteTarget?.serviceName}
               </span>{" "}
-              will be permanently removed from the platform and the public
-              catalogue. This action cannot be undone.
+              for everyone. Vendors will no longer see it in their studio.
             </DialogDescription>
           </DialogHeader>
-
           <DialogFooter className="mt-4 gap-2">
             <Button
               type="button"
               variant="outline"
               disabled={deleting}
               onClick={() => setDeleteTarget(null)}
-              className={cn(
-                "rounded-full border-rose-200 dark:border-input",
-                focusRingClassName
-              )}
+              className="rounded-full border-rose-200 dark:border-input"
             >
-              Keep service
+              Cancel
             </Button>
             <Button
               type="button"
+              variant="destructive"
               disabled={deleting}
               onClick={handleDelete}
-              className={cn(
-                "gap-2 rounded-full bg-rose-600 text-white hover:bg-rose-700",
-                focusRingClassName
-              )}
+              className="gap-2 rounded-full bg-rose-600 text-white hover:bg-rose-700"
             >
-              {deleting ? (
-                <LoaderCircle className="size-4 animate-spin" />
-              ) : (
-                <Trash2 className="size-4" />
-              )}
-              Delete permanently
+              <Trash2 className="size-4" />
+              {deleting ? "Deleting…" : "Delete"}
             </Button>
           </DialogFooter>
         </DialogContent>
