@@ -13,7 +13,10 @@ export const API_ENDPOINTS = {
   bookings: `${API_BASE_URL}/bookings`,
   customerBookings: (customerId: string) =>
     `${API_BASE_URL}/bookings/customer/${customerId}`,
+  vendorBookings: (vendorId: string) =>
+    `${API_BASE_URL}/bookings/vendor/${vendorId}`,
   cancelBooking: (id: string) => `${API_BASE_URL}/bookings/${id}/cancel`,
+  bookingStatus: (id: string) => `${API_BASE_URL}/bookings/${id}/status`,
 } as const
 
 export const CURRENCY = "USD"
