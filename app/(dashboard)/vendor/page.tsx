@@ -19,7 +19,9 @@ import { useSession } from "@/lib/auth-client"
  * the Express API endpoints are wired in.
  */
 export default function VendorOverviewPage() {
-  const { isPending } = useSession()
+  const { data, isPending } = useSession()
+  const plan = String(data?.user?.subscriptionPlan ?? "free").toLowerCase()
+  const planLabel = plan === "premium" ? "Premium" : "Free"
 
   if (isPending) return <PageSkeleton />
 
@@ -31,7 +33,7 @@ export default function VendorOverviewPage() {
         <StatCard label="Active Services" value="—" icon={Store} />
         <StatCard label="Pending Requests" value="—" icon={CalendarHeart} />
         <StatCard label="Accepted Bookings" value="—" icon={CalendarCheck} />
-        <StatCard label="Current Plan" value="Free" icon={HandCoins} />
+        <StatCard label="Current Plan" value={planLabel} icon={HandCoins} />
       </div>
       <p className="mt-4 text-xs text-stone-500 dark:text-muted-foreground">
         Live numbers will populate once the Express API statistics endpoint is

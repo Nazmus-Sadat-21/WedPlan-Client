@@ -1,16 +1,17 @@
 import type { Metadata } from "next"
 
-import { ComingSoon } from "@/components/Shared/ComingSoon"
+import { SubscriptionPlans } from "@/components/vendor/SubscriptionPlans"
 
-export const metadata: Metadata = { title: "Subscription" }
+export const metadata: Metadata = {
+  title: "Subscription | WedPlan",
+  description:
+    "Compare the Free and Premium vendor plans. Upgrade for $29 a year to publish unlimited services and unlock the Premium vendor badge.",
+}
 
 export default function SubscriptionPage() {
   return (
-    <ComingSoon
-      title="Subscription Plans"
-      description="Compare the Free and Premium plans and upgrade to publish unlimited active services."
-      backHref="/vendor"
-      backLabel="Back to Overview"
-    />
+    <section className="mx-auto w-full max-w-7xl">
+      <SubscriptionPlans />
+    </section>
   )
 }

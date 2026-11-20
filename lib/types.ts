@@ -76,3 +76,28 @@ export interface Booking {
   /** Populated by `GET /bookings/vendor/:vendorId` for the vendor dashboard. */
   customer?: BookingCustomer | null
 }
+
+/** Vendor details embedded in an admin transaction by `GET /transactions`. */
+export interface TransactionVendor {
+  _id: string
+  name?: string | null
+  email?: string | null
+  image?: string | null
+  businessName?: string | null
+}
+
+/** A premium subscription payment saved by the verified Stripe webhook. */
+export interface Transaction {
+  _id: string
+  vendorId: string
+  plan: string
+  amount: number
+  currency: string
+  stripeSessionId?: string
+  stripeSubscriptionId?: string | null
+  status: string
+  createdAt?: string
+  /** Populated by the admin `GET /transactions` endpoint. */
+  vendor?: TransactionVendor | null
+  vendorEmail?: string | null
+}

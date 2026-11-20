@@ -1,16 +1,17 @@
 import type { Metadata } from "next"
 
-import { ComingSoon } from "@/components/Shared/ComingSoon"
+import { Transactions } from "@/components/admin/Transactions"
 
-export const metadata: Metadata = { title: "Transactions" }
+export const metadata: Metadata = {
+  title: "Transactions | WedPlan",
+  description:
+    "Review vendor Premium subscription payments, amounts and statuses recorded from verified Stripe events.",
+}
 
 export default function TransactionsPage() {
   return (
-    <ComingSoon
-      title="Transactions"
-      description="Review vendor subscription payments, amounts and statuses recorded from verified Stripe events."
-      backHref="/admin"
-      backLabel="Back to Overview"
-    />
+    <section className="mx-auto w-full max-w-7xl">
+      <Transactions />
+    </section>
   )
 }

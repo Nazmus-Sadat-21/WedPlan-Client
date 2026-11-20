@@ -17,6 +17,12 @@ export const API_ENDPOINTS = {
     `${API_BASE_URL}/bookings/vendor/${vendorId}`,
   cancelBooking: (id: string) => `${API_BASE_URL}/bookings/${id}/cancel`,
   bookingStatus: (id: string) => `${API_BASE_URL}/bookings/${id}/status`,
+  createCheckoutSession: `${API_BASE_URL}/create-checkout-session`,
+  transactionBySession: (sessionId: string) =>
+    `${API_BASE_URL}/transactions/session/${sessionId}`,
+  vendorTransactions: (vendorId: string) =>
+    `${API_BASE_URL}/transactions/vendor/${vendorId}`,
+  transactions: `${API_BASE_URL}/transactions`,
 } as const
 
 export const CURRENCY = "USD"
