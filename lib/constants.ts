@@ -23,6 +23,7 @@ export const API_ENDPOINTS = {
   vendorTransactions: (vendorId: string) =>
     `${API_BASE_URL}/transactions/vendor/${vendorId}`,
   transactions: `${API_BASE_URL}/transactions`,
+  UpdateProfile: `${API_BASE_URL}/users/update-profile`,
 } as const
 
 export const CURRENCY = "USD"

@@ -168,7 +168,7 @@ export function FeaturedServices() {
                 <motion.div key={service._id} variants={item}>
                   <ServiceCard service={service} priority={index < 3} />
                 </motion.div>
-              ))}
+              )).slice(0, 6)}
             </motion.div>
           )}
         </div>

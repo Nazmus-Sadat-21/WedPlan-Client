@@ -1,16 +1,11 @@
 import type { Metadata } from "next"
+import { ProfilePageClient } from "@/components/Shared/ProfilePageClient"
 
-import { ComingSoon } from "@/components/Shared/ComingSoon"
-
-export const metadata: Metadata = { title: "Admin Profile" }
+export const metadata: Metadata = {
+  title: "Admin Update Profile",
+}
 
 export default function AdminProfileSettingsPage() {
-  return (
-    <ComingSoon
-      title="Admin Profile Settings"
-      description="Update your administrator account details."
-      backHref="/admin"
-      backLabel="Back to Overview"
-    />
-  )
+
+ return <ProfilePageClient />
 }
