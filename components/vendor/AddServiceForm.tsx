@@ -369,7 +369,6 @@ export function AddServiceForm() {
       )
 
       const created = await createService({
-        vendorId: user.id,
         serviceName: serviceName.trim(),
         category,
         description: description.trim(),

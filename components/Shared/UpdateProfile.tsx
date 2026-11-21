@@ -28,6 +28,7 @@ import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Skeleton } from "@/components/ui/skeleton"
 import { useSession } from "@/lib/auth-client"
+import { authFetch } from "@/lib/auth-fetch"
 import { formatDate } from "@/lib/format"
 import { uploadToImgbb } from "@/lib/imgbb"
 import { cn } from "@/lib/utils"
@@ -240,10 +241,9 @@ export function UpdateProfile({ data, onUpdated }: UpdateProfileProps) {
         ? `${baseUrl}/users/profile/${encodeURIComponent(String(profileId))}`
         : `/users/profile/${encodeURIComponent(String(profileId))}`
 
-      const res = await fetch(endpoint, {
+      const res = await authFetch(endpoint, {
         method: "PATCH",
         headers: { "Content-Type": "application/json" },
-        credentials: "include",
         body: JSON.stringify(payload),
       })
 

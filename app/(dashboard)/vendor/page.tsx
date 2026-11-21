@@ -17,6 +17,7 @@ import { PageSkeleton } from "@/components/dashboard/PageSkeleton"
 import { StatCard } from "@/components/dashboard/StatCard"
 import { Skeleton } from "@/components/ui/skeleton"
 import { useSession } from "@/lib/auth-client"
+import { authFetch } from "@/lib/auth-fetch"
 import { isServiceActive } from "@/lib/api"
 import { API_ENDPOINTS } from "@/lib/constants"
 import {
@@ -67,17 +68,6 @@ function approvalOf(service: Service): "approved" | "pending" | "rejected" {
   if (raw === "approved") return "approved"
   if (raw === "rejected") return "rejected"
   return "pending"
-}
-
-function vendorIdOf(service: Service): string | null {
-  const raw: unknown = service.vendorId ?? service.vendor
-  if (!raw) return null
-  if (typeof raw === "string") return raw
-  if (typeof raw === "object") {
-    if ("_id" in raw) return String((raw as { _id: unknown })._id)
-    if ("id" in raw) return String((raw as { id: unknown }).id)
-  }
-  return null
 }
 
 function sampleBookingSummary(): BookingSummary {
@@ -203,8 +193,7 @@ export default function VendorOverviewPage() {
       setLoading(true)
 
       const [servicesResult, bookingsResult] = await Promise.allSettled([
-        fetch(API_ENDPOINTS.services, {
-          credentials: "include",
+        authFetch(API_ENDPOINTS.vendorServices, {
           cache: "no-store",
           signal: controller.signal,
         }).then(async (res) => {
@@ -212,8 +201,7 @@ export default function VendorOverviewPage() {
           const json = await res.json()
           return (Array.isArray(json) ? json : (json?.data ?? [])) as Service[]
         }),
-        fetch(vendorBookingsEndpoint(userId!), {
-          credentials: "include",
+        authFetch(vendorBookingsEndpoint(userId!), {
           cache: "no-store",
           signal: controller.signal,
           headers: { Accept: "application/json" },
@@ -227,11 +215,7 @@ export default function VendorOverviewPage() {
       if (!active || controller.signal.aborted) return
 
       if (servicesResult.status === "fulfilled") {
-        setServices(
-          servicesResult.value.filter(
-            (item) => vendorIdOf(item) === String(userId)
-          )
-        )
+        setServices(servicesResult.value)
       } else {
         setServices([])
       }

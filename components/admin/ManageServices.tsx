@@ -43,6 +43,7 @@ import {
 } from "@/components/ui/select"
 import { Skeleton } from "@/components/ui/skeleton"
 import { isServiceActive } from "@/lib/api"
+import { authFetch } from "@/lib/auth-fetch"
 import {
   API_ENDPOINTS,
   CATEGORY_IMAGES,
@@ -170,9 +171,8 @@ export function ManageServices() {
 
     async function load() {
       try {
-        const servicesRes = await fetch(API_ENDPOINTS.services, {
+        const servicesRes = await authFetch(API_ENDPOINTS.adminServices, {
           cache: "no-store",
-          credentials: "include",
           signal: controller.signal,
         })
 
@@ -190,9 +190,8 @@ export function ManageServices() {
 
         let userList: AdminUser[] = []
         try {
-          const usersRes = await fetch(API_ENDPOINTS.users, {
+          const usersRes = await authFetch(API_ENDPOINTS.users, {
             cache: "no-store",
-            credentials: "include",
             signal: controller.signal,
           })
           if (usersRes.ok) {
@@ -311,9 +310,8 @@ export function ManageServices() {
 
     setUpdatingId(service._id)
     try {
-      const res = await fetch(API_ENDPOINTS.serviceStatus(service._id), {
+      const res = await authFetch(API_ENDPOINTS.serviceStatus(service._id), {
         method: "PATCH",
-        credentials: "include",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ status }),
       })
@@ -357,11 +355,10 @@ export function ManageServices() {
 
     setDeleting(true)
     try {
-      const res = await fetch(
+      const res = await authFetch(
         API_ENDPOINTS.adminServiceById(deleteTarget._id),
         {
           method: "DELETE",
-          credentials: "include",
         }
       )
 

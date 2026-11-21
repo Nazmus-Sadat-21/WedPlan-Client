@@ -42,6 +42,7 @@ import {
   SelectValue,
 } from "@/components/ui/select"
 import { Skeleton } from "@/components/ui/skeleton"
+import { authFetch } from "@/lib/auth-fetch"
 import { API_ENDPOINTS } from "@/lib/constants"
 import { formatDate, getUserInitials } from "@/lib/format"
 import type { AdminUser } from "@/lib/types"
@@ -186,9 +187,8 @@ export function ManageUsers() {
 
     async function loadUsers() {
       try {
-        const res = await fetch(API_ENDPOINTS.users, {
+        const res = await authFetch(API_ENDPOINTS.users, {
           cache: "no-store",
-          credentials: "include",
           signal: controller.signal,
         })
 
@@ -274,13 +274,12 @@ export function ManageUsers() {
   async function applyBlock(user: AdminUser, block: boolean) {
     setBusyId(user._id)
     try {
-      const res = await fetch(
+      const res = await authFetch(
         block
           ? API_ENDPOINTS.blockUser(user._id)
           : API_ENDPOINTS.unblockUser(user._id),
         {
           method: "PATCH",
-          credentials: "include",
           headers: { "Content-Type": "application/json" },
         }
       )

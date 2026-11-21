@@ -39,6 +39,7 @@ import {
   type MonthPoint,
 } from "@/components/dashboard/overview-charts"
 import { useSession } from "@/lib/auth-client"
+import { authFetch } from "@/lib/auth-fetch"
 import { API_ENDPOINTS } from "@/lib/constants"
 import type { AdminUser, Service } from "@/lib/types"
 import { cn } from "@/lib/utils"
@@ -156,21 +157,20 @@ export default function AdminOverviewPage() {
 
       const init = {
         cache: "no-store" as const,
-        credentials: "include" as const,
         signal: controller.signal,
       }
 
       const [usersResult, servicesResult, transactionsResult] =
         await Promise.allSettled([
-          fetch(API_ENDPOINTS.users, init).then((res) => {
+          authFetch(API_ENDPOINTS.users, init).then((res) => {
             if (!res.ok) throw new Error("Could not load platform users.")
             return res.json()
           }),
-          fetch(API_ENDPOINTS.services, init).then((res) => {
+          authFetch(API_ENDPOINTS.adminServices, init).then((res) => {
             if (!res.ok) throw new Error("Could not load platform services.")
             return res.json()
           }),
-          fetch(TRANSACTIONS_ENDPOINT, init).then((res) => {
+          authFetch(TRANSACTIONS_ENDPOINT, init).then((res) => {
             if (!res.ok) throw new Error("Could not load transactions.")
             return res.json()
           }),

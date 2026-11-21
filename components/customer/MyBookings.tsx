@@ -39,6 +39,7 @@ import {
 import { Input } from "@/components/ui/input"
 import { Skeleton } from "@/components/ui/skeleton"
 import { useSession } from "@/lib/auth-client"
+import { authFetch } from "@/lib/auth-fetch"
 import { API_ENDPOINTS, CATEGORY_IMAGES } from "@/lib/constants"
 import { formatDate, getUserInitials } from "@/lib/format"
 import type { Booking, Service } from "@/lib/types"
@@ -52,7 +53,6 @@ const STATUS_FILTERS = [
   { id: "pending", label: "Pending" },
   { id: "accepted", label: "Accepted" },
   { id: "rejected", label: "Declined" },
-  { id: "cancelled", label: "Cancelled" },
 ] as const
 
 const controlClassName =
@@ -203,7 +203,7 @@ function statusNote(status: BookingStatusKey): string {
     return "The vendor declined this request. Browse other services to find an alternative for your date."
   }
   if (status === "cancelled") {
-    return "You cancelled this request. It stays here for your records and can no longer be changed."
+    return "You cancelled this request. It is removed from your list and can no longer be changed."
   }
   return "This request is waiting for the vendor. You can cancel it any time before they respond."
 }
@@ -241,9 +241,8 @@ export function MyBookings() {
       setError(null)
 
       try {
-        const response = await fetch(API_ENDPOINTS.customerBookings(userId!), {
+        const response = await authFetch(API_ENDPOINTS.customerBookings(userId!), {
           cache: "no-store",
-          credentials: "include",
           signal: controller.signal,
           headers: { Accept: "application/json" },
         })
@@ -337,16 +336,15 @@ export function MyBookings() {
 
     setCancelling(true)
     try {
-      const response = await fetch(
+      const response = await authFetch(
         API_ENDPOINTS.cancelBooking(cancelTarget._id),
         {
           method: "PATCH",
-          credentials: "include",
           headers: {
             Accept: "application/json",
             "Content-Type": "application/json",
           },
-          body: JSON.stringify({ customerId: userId }),
+          body: JSON.stringify({}),
         }
       )
 
@@ -355,12 +353,10 @@ export function MyBookings() {
         throw new Error(body?.message ?? "Could not cancel this booking.")
       }
 
+      // Cancelled requests are removed from the customer's list entirely; the
+      // server keeps the record so the vendor still sees what happened.
       setBookings((prev) =>
-        prev.map((booking) =>
-          booking._id === cancelTarget._id
-            ? { ...booking, status: "cancelled" }
-            : booking
-        )
+        prev.filter((booking) => booking._id !== cancelTarget._id)
       )
       setCancelTarget(null)
       setViewBookingId(null)
@@ -429,7 +425,7 @@ export function MyBookings() {
       </header>
 
       {/* Metrics */}
-      <div className="grid grid-cols-2 gap-3.5 lg:grid-cols-5">
+      <div className="grid grid-cols-2 gap-3.5 lg:grid-cols-4">
         <BookingMetric
           label="All requests"
           value={loading ? "—" : stats.total}
@@ -457,13 +453,6 @@ export function MyBookings() {
           hint="Not available for your date"
           icon={XCircle}
           tone="rose"
-        />
-        <BookingMetric
-          label="Cancelled"
-          value={loading ? "—" : stats.cancelled}
-          hint="Withdrawn by you"
-          icon={Ban}
-          tone="slate"
         />
       </div>
 
@@ -923,9 +912,9 @@ export function MyBookings() {
               Cancel this booking request?
             </DialogTitle>
             <DialogDescription className="text-sm leading-relaxed text-stone-600 dark:text-muted-foreground">
-              This cannot be undone. The vendor will see this request as
-              cancelled, and you will need to send a new request if you change
-              your mind.
+              This cannot be undone. The request will be removed from your list
+              and the vendor will see it as cancelled. You will need to send a
+              new request if you change your mind.
             </DialogDescription>
           </DialogHeader>
 

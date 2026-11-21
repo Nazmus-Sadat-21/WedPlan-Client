@@ -23,6 +23,7 @@ import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
 import { Skeleton } from "@/components/ui/skeleton"
 import { useSession } from "@/lib/auth-client"
+import { authFetch } from "@/lib/auth-fetch"
 import { API_ENDPOINTS } from "@/lib/constants"
 import { formatDate } from "@/lib/format"
 import type { Transaction } from "@/lib/types"
@@ -177,11 +178,10 @@ export function SubscriptionPlans() {
       setHistoryLoading(true)
       setHistoryError(false)
       try {
-        const response = await fetch(
+        const response = await authFetch(
           API_ENDPOINTS.vendorTransactions(userId!),
           {
             cache: "no-store",
-            credentials: "include",
             signal: controller.signal,
             headers: { Accept: "application/json" },
           }

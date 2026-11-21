@@ -52,6 +52,10 @@ export function SignInForm() {
       return
     }
 
+    if (data?.user?.isBlocked) {
+  router.push("/blocked")
+  return
+}
     toast.success("Welcome back!")
     setSubmitting(false)
     router.push(dashboardPathForRole(data?.user?.role))

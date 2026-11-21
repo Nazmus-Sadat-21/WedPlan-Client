@@ -31,8 +31,9 @@ import { Label } from "@/components/ui/label"
 import { Skeleton } from "@/components/ui/skeleton"
 import { Textarea } from "@/components/ui/textarea"
 import { useSession } from "@/lib/auth-client"
+import { authFetch } from "@/lib/auth-fetch"
 import { isPublicService } from "@/lib/api"
-import { CATEGORY_IMAGES } from "@/lib/constants"
+import { API_ENDPOINTS, CATEGORY_IMAGES } from "@/lib/constants"
 import { formatPrice, getUserInitials } from "@/lib/format"
 import type { Service, Vendor } from "@/lib/types"
 import { cn } from "@/lib/utils"
@@ -60,6 +61,13 @@ export default function BrowseServiceDetailsPage() {
   const [bookedSuccess, setBookedSuccess] = useState(false)
 
   useEffect(() => {
+    // Service details are a private page: signed-out visitors go to sign-in.
+    if (!sessionLoading && !user) {
+      router.replace("/sign-in")
+    }
+  }, [sessionLoading, user, router])
+
+  useEffect(() => {
     if (!params?.id) return
 
     let isMounted = true
@@ -67,8 +75,7 @@ export default function BrowseServiceDetailsPage() {
       setLoading(true)
       setError(null)
       try {
-        const baseUrl = process.env.NEXT_PUBLIC_SERVER_API ?? ""
-        const res = await fetch(`${baseUrl}/services/${params.id}`, {
+        const res = await authFetch(API_ENDPOINTS.serviceById(params.id), {
           cache: "no-store",
         })
 
@@ -110,7 +117,7 @@ export default function BrowseServiceDetailsPage() {
         if (vendorIdToFetch) {
           try {
             const vendorRes = await fetch(
-              `${baseUrl}/users/${vendorIdToFetch}`,
+              API_ENDPOINTS.publicVendor(vendorIdToFetch),
               {
                 cache: "no-store",
               }
@@ -288,16 +295,14 @@ export default function BrowseServiceDetailsPage() {
 
     setBookingSubmitting(true)
     try {
-      const baseUrl = process.env.NEXT_PUBLIC_SERVER_API ?? ""
-      const response = await fetch(`${baseUrl}/bookings`, {
+      // The server takes the customer identity from the verified JWT.
+      const response = await authFetch(API_ENDPOINTS.bookings, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
         },
-        credentials: "include",
         body: JSON.stringify({
           serviceId: service._id,
-          customerId: user.id,
           eventDate,
           eventLocation: eventLocation.trim(),
           message: message.trim() || undefined,

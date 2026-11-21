@@ -17,6 +17,7 @@ import {
 } from "@/components/ui/sheet"
 import { Logo } from "@/components/Shared/Logo"
 import { DASHBOARD_NAV, type NavItem } from "@/components/dashboard/nav"
+import { DashboardLoader } from "@/components/dashboard/RoleGate"
 import { signOut, useSession } from "@/lib/auth-client"
 import { getUserInitials } from "@/lib/format"
 import { cn } from "@/lib/utils"
@@ -161,20 +162,47 @@ function SidebarContent({
  * Dashboard shell: fixed left sidebar on desktop, Sheet drawer on mobile,
  * with a sticky mobile top bar. Navigation is rendered from the signed-in
  * user's role.
+ *
+ * The shell also enforces the role itself: the first URL segment
+ * (/vendor, /customer, /admin) must match the signed-in user's role, otherwise
+ * the visitor is sent to /unauthorized without ever seeing the shell.
  */
 export function DashboardShell({ children }: { children: React.ReactNode }) {
   const { data, isPending } = useSession()
   const router = useRouter()
+  const pathname = usePathname()
   const [mobileOpen, setMobileOpen] = useState(false)
   const user = data?.user
   const role = (user?.role ?? "customer") as string
 
-  // Unauthenticated visitors never see the shell.
-  useEffect(() => {
-    if (!isPending && !user) router.replace("/sign-in")
-  }, [isPending, user, router])
+  // /vendor, /customer or /admin: the first URL segment names the dashboard
+  const routeRole = pathname.split("/")[1]
+  const isRoleRoute = ["admin", "vendor", "customer"].includes(routeRole)
+  const wrongRole =
+    Boolean(user) &&
+    isRoleRoute &&
+    routeRole !== String(user?.role ?? "").toLowerCase()
 
-  if (isPending || !user) return null
+  useEffect(() => {
+    if (isPending) return
+
+    // Unauthenticated visitors never see the shell.
+    if (!user) {
+      router.replace("/sign-in")
+      return
+    }
+
+    if (user.isBlocked) {
+  router.replace("/blocked")
+  return
+}
+    // Signed-in user opening another role's dashboard by URL.
+    if (wrongRole) {
+      router.replace("/unauthorized")
+    }
+  }, [isPending, user, wrongRole, router])
+
+  if (isPending || !user) return <DashboardLoader />
 
   // Blocked users cannot access protected platform features.
   if (user.isBlocked) {
@@ -200,6 +228,9 @@ export function DashboardShell({ children }: { children: React.ReactNode }) {
       </div>
     )
   }
+
+  // Wrong dashboard for this role: show nothing of the shell while redirecting
+  if (wrongRole) return <DashboardLoader label="Redirecting…" />
 
   return (
     <div className="min-h-svh bg-[#FDFBF7] dark:bg-background">
@@ -239,7 +270,8 @@ export function DashboardShell({ children }: { children: React.ReactNode }) {
           </SheetContent>
         </Sheet>
         <span className="font-heading text-xl font-semibold text-stone-900 dark:text-foreground">
-          <span className="text-white">wed</span><span className="text-[#B76E79] italic">Plan</span>
+          <span className="text-stone-900 dark:text-white">wed</span>
+          <span className="text-[#B76E79] italic">Plan</span>
         </span>
       </header>
 

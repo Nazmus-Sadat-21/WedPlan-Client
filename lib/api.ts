@@ -1,3 +1,4 @@
+import { authFetch } from "@/lib/auth-fetch"
 import { API_ENDPOINTS } from "@/lib/constants"
 import type { Service, ServiceAvailability, ServiceStatus } from "@/lib/types"
 
@@ -39,7 +40,7 @@ export async function fetchServices(
 ): Promise<Service[]> {
   let response: Response
   try {
-    response = await fetch(API_ENDPOINTS.services, {
+    response = await authFetch(API_ENDPOINTS.services, {
       signal: options.signal,
       headers: { Accept: "application/json" },
     })
@@ -85,14 +86,13 @@ export function isPublicService(service: Service): boolean {
 
 /** Services belonging to one vendor (includes pending/rejected services). */
 export async function fetchVendorServices(
-  vendorId: string,
+  _vendorId: string,
   options: { signal?: AbortSignal } = {}
 ): Promise<Service[]> {
   let response: Response
   try {
-    response = await fetch(API_ENDPOINTS.vendorServices, {
+    response = await authFetch(API_ENDPOINTS.vendorServices, {
       signal: options.signal,
-      credentials: "include",
       headers: { Accept: "application/json" },
     })
   } catch (error) {
@@ -102,21 +102,6 @@ export async function fetchVendorServices(
     throw new ApiError(
       "Unable to reach your services right now. Please check your connection and try again."
     )
-  }
-
-  // Older API builds may not expose the protected vendor endpoint yet; fall
-  // back to filtering the public catalogue by vendor id.
-  if (response.status === 404) {
-    const all = await fetchServices(options)
-    return all.filter((service) => {
-      if (typeof service.vendorId === "string") {
-        return service.vendorId === vendorId
-      }
-      if (service.vendorId && typeof service.vendorId === "object") {
-        return service.vendorId._id === vendorId
-      }
-      return service.vendor?._id === vendorId
-    })
   }
 
   if (!response.ok) {
@@ -131,7 +116,8 @@ export async function fetchVendorServices(
 }
 
 export interface NewServiceInput {
-  vendorId: string
+  /** Ignored by the server; the vendor identity always comes from the JWT. */
+  vendorId?: string
   serviceName: string
   category: string
   description: string
@@ -151,9 +137,8 @@ export interface NewServiceInput {
 export async function createService(input: NewServiceInput): Promise<Service> {
   let response: Response
   try {
-    response = await fetch(API_ENDPOINTS.services, {
+    response = await authFetch(API_ENDPOINTS.services, {
       method: "POST",
-      credentials: "include",
       headers: {
         Accept: "application/json",
         "Content-Type": "application/json",

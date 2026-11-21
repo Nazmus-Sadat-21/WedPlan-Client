@@ -34,6 +34,7 @@ import {
 } from "@/components/ui/dialog"
 import { Input } from "@/components/ui/input"
 import { Skeleton } from "@/components/ui/skeleton"
+import { authFetch } from "@/lib/auth-fetch"
 import { API_ENDPOINTS } from "@/lib/constants"
 import { formatDate, getUserInitials } from "@/lib/format"
 import type { Transaction } from "@/lib/types"
@@ -182,9 +183,8 @@ export function Transactions() {
 
     async function loadTransactions() {
       try {
-        const response = await fetch(API_ENDPOINTS.transactions, {
+        const response = await authFetch(API_ENDPOINTS.transactions, {
           cache: "no-store",
-          credentials: "include",
           signal: controller.signal,
           headers: { Accept: "application/json" },
         })

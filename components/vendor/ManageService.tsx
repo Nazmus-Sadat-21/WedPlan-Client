@@ -44,6 +44,7 @@ import { Skeleton } from "@/components/ui/skeleton"
 import { Textarea } from "@/components/ui/textarea"
 import { useSession } from "@/lib/auth-client"
 import { isServiceActive } from "@/lib/api"
+import { authFetch } from "@/lib/auth-fetch"
 import {
   API_ENDPOINTS,
   CATEGORY_IMAGES,
@@ -202,8 +203,7 @@ export function ManageService() {
 
     async function loadServices() {
       try {
-        const res = await fetch(API_ENDPOINTS.services, {
-          credentials: "include",
+        const res = await authFetch(API_ENDPOINTS.vendorServices, {
           cache: "no-store",
           signal: controller.signal,
         })
@@ -333,14 +333,10 @@ export function ManageService() {
 
     setTogglingId(service._id)
     try {
-      const res = await fetch(API_ENDPOINTS.serviceById(service._id), {
+      const res = await authFetch(API_ENDPOINTS.serviceById(service._id), {
         method: "PATCH",
         headers: { "Content-Type": "application/json" },
-        credentials: "include",
-        body: JSON.stringify({
-          vendorId: userId,
-          availability: nextAvailability,
-        }),
+        body: JSON.stringify({ availability: nextAvailability }),
       })
 
       if (!res.ok) {
@@ -413,7 +409,6 @@ export function ManageService() {
       }
 
       const payload = {
-        vendorId: userId,
         serviceName: editForm.serviceName.trim(),
         category: editForm.category,
         price: parsedPrice,
@@ -423,10 +418,9 @@ export function ManageService() {
         availability: enforcedAvailability ? "active" : "inactive",
       }
 
-      const res = await fetch(API_ENDPOINTS.serviceById(editService._id), {
+      const res = await authFetch(API_ENDPOINTS.serviceById(editService._id), {
         method: "PATCH",
         headers: { "Content-Type": "application/json" },
-        credentials: "include",
         body: JSON.stringify(payload),
       })
 
@@ -467,13 +461,9 @@ export function ManageService() {
 
     setDeleting(true)
     try {
-      const res = await fetch(
-        `${API_ENDPOINTS.serviceById(deleteTarget._id)}?vendorId=${encodeURIComponent(userId)}`,
-        {
-          method: "DELETE",
-          credentials: "include",
-        }
-      )
+      const res = await authFetch(API_ENDPOINTS.serviceById(deleteTarget._id), {
+        method: "DELETE",
+      })
 
       if (!res.ok) {
         const body = await res.json().catch(() => null)

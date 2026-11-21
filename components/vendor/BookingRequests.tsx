@@ -41,6 +41,7 @@ import {
 import { Input } from "@/components/ui/input"
 import { Skeleton } from "@/components/ui/skeleton"
 import { useSession } from "@/lib/auth-client"
+import { authFetch } from "@/lib/auth-fetch"
 import { API_ENDPOINTS, CATEGORY_IMAGES } from "@/lib/constants"
 import { formatDate, formatPrice, getUserInitials } from "@/lib/format"
 import type { Booking, Service } from "@/lib/types"
@@ -249,9 +250,8 @@ export function BookingRequests() {
       setError(null)
 
       try {
-        const response = await fetch(API_ENDPOINTS.vendorBookings(userId!), {
+        const response = await authFetch(API_ENDPOINTS.vendorBookings(userId!), {
           cache: "no-store",
-          credentials: "include",
           signal: controller.signal,
           headers: { Accept: "application/json" },
         })
@@ -351,14 +351,15 @@ export function BookingRequests() {
     setProcessingId(booking._id)
 
     try {
-      const response = await fetch(API_ENDPOINTS.bookingStatus(booking._id), {
+      // The server identifies the vendor from the JWT and only allows a
+      // pending request to move to accepted/rejected.
+      const response = await authFetch(API_ENDPOINTS.bookingStatus(booking._id), {
         method: "PATCH",
-        credentials: "include",
         headers: {
           Accept: "application/json",
           "Content-Type": "application/json",
         },
-        body: JSON.stringify({ status: action, vendorId: userId }),
+        body: JSON.stringify({ status: action }),
       })
 
       const body = await response.json().catch(() => null)

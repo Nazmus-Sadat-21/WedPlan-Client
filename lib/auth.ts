@@ -1,4 +1,5 @@
 import { betterAuth } from "better-auth"
+import { jwt } from "better-auth/plugins"
 import { MongoClient } from "mongodb"
 import { mongodbAdapter } from "@better-auth/mongo-adapter"
 
@@ -6,6 +7,7 @@ const client = new MongoClient(process.env.MONGO_URI as string)
 const db = client.db("WedPlan")
 
 export const auth = betterAuth({
+  baseURL: process.env.BETTER_AUTH_URL,
   emailAndPassword: {
     enabled: true,
   },
@@ -84,12 +86,23 @@ export const auth = betterAuth({
       },
     },
   },
-  //   plugins: [jwt()],
-  //   session: {
-  //     cookieCache: {
-  //       enabled: true,
-  //       strategy: "jwt",
-  //       maxAge: 7 * 24 * 60 * 60,
-  //     },
-  //   },
+  plugins: [
+    // Issues short-lived, asymmetric JWTs from the current session. The Express
+    // API verifies these tokens against the public JWKS endpoint, so every API
+    // call is authenticated independently of the browser cookie.
+    jwt({
+      jwt: {
+        issuer: process.env.BETTER_AUTH_URL,
+        audience: "wedplan-api",
+        expirationTime: "10m",
+        definePayload: ({ user }) => ({
+          name: user.name,
+          email: user.email,
+          role: user.role ?? "customer",
+          isBlocked: Boolean(user.isBlocked),
+          subscriptionPlan: user.subscriptionPlan ?? "free",
+        }),
+      },
+    }),
+  ],
 })

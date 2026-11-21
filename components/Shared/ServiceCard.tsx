@@ -12,7 +12,7 @@ import {
 
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { Badge } from "@/components/ui/badge"
-import { CATEGORY_IMAGES } from "@/lib/constants"
+import { CATEGORY_IMAGES, API_ENDPOINTS } from "@/lib/constants"
 import { formatPrice, getUserInitials } from "@/lib/format"
 import type { Service, Vendor } from "@/lib/types"
 import { cn } from "@/lib/utils"
@@ -48,11 +48,11 @@ export function ServiceCard({
     }
 
     if (vendorId && !vendorData) {
+      const vendorLookupId = vendorId
       let isMounted = true
       async function fetchVendor() {
         try {
-          const baseUrl = process.env.NEXT_PUBLIC_SERVER_API ?? ""
-          const res = await fetch(`${baseUrl}/users/${vendorId}`, {
+          const res = await fetch(API_ENDPOINTS.publicVendor(vendorLookupId), {
             cache: "no-store",
           })
           if (res.ok) {

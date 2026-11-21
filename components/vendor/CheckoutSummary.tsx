@@ -24,6 +24,7 @@ import { toast } from "sonner"
 import { Button } from "@/components/ui/button"
 import { Skeleton } from "@/components/ui/skeleton"
 import { useSession } from "@/lib/auth-client"
+import { authFetch } from "@/lib/auth-fetch"
 import { API_ENDPOINTS } from "@/lib/constants"
 import { cn } from "@/lib/utils"
 
@@ -73,14 +74,15 @@ export function CheckoutSummary() {
     setError(null)
 
     try {
-      const response = await fetch(API_ENDPOINTS.createCheckoutSession, {
+      // The server derives the vendor from the verified JWT; the body is empty
+      // so a vendor can never start a checkout for somebody else.
+      const response = await authFetch(API_ENDPOINTS.createCheckoutSession, {
         method: "POST",
-        credentials: "include",
         headers: {
           Accept: "application/json",
           "Content-Type": "application/json",
         },
-        body: JSON.stringify({ vendorId: userId }),
+        body: JSON.stringify({}),
       })
 
       const body = await response.json().catch(() => null)

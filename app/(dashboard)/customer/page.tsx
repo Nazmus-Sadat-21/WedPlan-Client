@@ -32,6 +32,7 @@ import {
   summarizeBookings,
 } from "@/components/dashboard/overview-charts"
 import { useSession } from "@/lib/auth-client"
+import { authFetch } from "@/lib/auth-fetch"
 import { API_ENDPOINTS } from "@/lib/constants"
 import type { Booking } from "@/lib/types"
 import { cn } from "@/lib/utils"
@@ -69,9 +70,8 @@ export default function CustomerOverviewPage() {
       setError(null)
 
       try {
-        const response = await fetch(API_ENDPOINTS.customerBookings(userId!), {
+        const response = await authFetch(API_ENDPOINTS.customerBookings(userId!), {
           cache: "no-store",
-          credentials: "include",
           signal: controller.signal,
           headers: { Accept: "application/json" },
         })
