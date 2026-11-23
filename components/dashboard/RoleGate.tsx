@@ -101,7 +101,6 @@ export function RoleGate({
 
   // Guards against double toasts/redirects (React StrictMode runs effects twice in dev)
   const handledRef = useRef(false)
-  console.log("RoleGate", { allowedRole, isPending, role, hasAccess })
   useEffect(() => {
     if (isPending) return
 

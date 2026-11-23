@@ -31,11 +31,11 @@ const item = {
 
 export function HowItWorks() {
   return (
-    <section className="relative overflow-hidden border-t border-rose-200/50 bg-[#FDFBF7] py-16 sm:py-20 lg:py-24">
+    <section className="relative overflow-hidden border-t border-rose-200/50 dark:border-border bg-[#FDFBF7] dark:bg-background py-16 sm:py-20 lg:py-24">
       {/* Soft background glow accents */}
       <div
         aria-hidden="true"
-        className="pointer-events-none absolute top-1/3 left-1/2 -z-10 h-96 w-96 -translate-x-1/2 -translate-y-1/2 rounded-full bg-rose-100/30 blur-3xl"
+        className="pointer-events-none absolute top-1/3 left-1/2 -z-10 h-96 w-96 -translate-x-1/2 -translate-y-1/2 rounded-full bg-rose-100/30 dark:bg-rose-400/10 blur-3xl"
       />
 
       <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
@@ -63,17 +63,17 @@ export function HowItWorks() {
             const Icon = ICONS[step.icon] ?? HeartHandshake
             return (
               <motion.li key={step.step} variants={item} className="relative">
-                <div className="flex h-full flex-col items-center rounded-2xl border border-rose-200/75 bg-white p-6 text-center shadow-xs transition-all duration-300 hover:-translate-y-1.5 hover:border-rose-300 hover:shadow-xl hover:shadow-rose-950/5 lg:p-7">
+                <div className="flex h-full flex-col items-center rounded-2xl border border-rose-200/75 dark:border-border bg-white dark:bg-card p-6 text-center shadow-xs transition-all duration-300 hover:-translate-y-1.5 hover:border-rose-300 dark:hover:border-rose-300/40 hover:shadow-xl hover:shadow-rose-950/5 dark:hover:shadow-black/30 lg:p-7">
                   <span className="font-heading text-4xl font-semibold text-[#B76E79]/40">
                     {step.step}
                   </span>
-                  <span className="mt-3 flex size-12 items-center justify-center rounded-full bg-rose-50 text-[#B76E79]">
+                  <span className="mt-3 flex size-12 items-center justify-center rounded-full bg-rose-50 dark:bg-rose-400/10 text-[#B76E79]">
                     <Icon className="size-5" />
                   </span>
-                  <h3 className="mt-4 font-heading text-xl font-semibold text-stone-800">
+                  <h3 className="mt-4 font-heading text-xl font-semibold text-stone-800 dark:text-foreground">
                     {step.title}
                   </h3>
-                  <p className="mt-2 text-sm leading-relaxed text-pretty text-stone-600">
+                  <p className="mt-2 text-sm leading-relaxed text-pretty text-stone-600 dark:text-muted-foreground">
                     {step.description}
                   </p>
                   {index < HOW_IT_WORKS_STEPS.length - 1 ? (
@@ -92,7 +92,7 @@ export function HowItWorks() {
           <Button
             size="lg"
             render={<Link href="/browse-services" />}
-            className="h-12 rounded-full bg-[#B76E79] px-8 text-base font-medium text-white shadow-md shadow-rose-900/10 transition-all hover:bg-[#a25c67] hover:shadow-lg"
+            className="h-12 rounded-full bg-[#B76E79] px-8 text-base font-medium text-white shadow-md shadow-rose-900/10 dark:shadow-black/20 transition-all hover:bg-[#a25c67] hover:shadow-lg"
           >
             Start Planning Today
           </Button>

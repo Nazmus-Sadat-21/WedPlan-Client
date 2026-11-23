@@ -166,23 +166,23 @@ export default function BrowseServiceDetailsPage() {
   // Loading State Skeleton
   if (loading) {
     return (
-      <main className="min-h-screen bg-[#FDFBF7] py-10">
+      <main className="min-h-screen bg-[#FDFBF7] dark:bg-background py-10">
         <div className="mx-auto max-w-7xl space-y-8 px-4 sm:px-6 lg:px-8">
-          <Skeleton className="h-9 w-44 rounded-full bg-rose-100/70" />
+          <Skeleton className="h-9 w-44 rounded-full bg-rose-100/70 dark:bg-rose-400/10" />
           <div className="grid gap-8 lg:grid-cols-12">
             <div className="space-y-4 lg:col-span-7">
-              <Skeleton className="aspect-[16/10] w-full rounded-3xl bg-rose-100/60" />
+              <Skeleton className="aspect-[16/10] w-full rounded-3xl bg-rose-100/60 dark:bg-rose-400/10" />
               <div className="grid grid-cols-4 gap-3">
                 {[1, 2, 3, 4].map((n) => (
                   <Skeleton
                     key={n}
-                    className="aspect-[4/3] rounded-2xl bg-rose-100/60"
+                    className="aspect-[4/3] rounded-2xl bg-rose-100/60 dark:bg-rose-400/10"
                   />
                 ))}
               </div>
             </div>
             <div className="space-y-6 lg:col-span-5">
-              <Skeleton className="h-96 w-full rounded-3xl bg-rose-100/60" />
+              <Skeleton className="h-96 w-full rounded-3xl bg-rose-100/60 dark:bg-rose-400/10" />
             </div>
           </div>
         </div>
@@ -193,15 +193,15 @@ export default function BrowseServiceDetailsPage() {
   // Error / Not Found State
   if (error || !service) {
     return (
-      <main className="flex min-h-[70svh] flex-col items-center justify-center bg-[#FDFBF7] px-4 py-20 text-center sm:px-6 lg:px-8">
-        <div className="max-w-md space-y-5 rounded-3xl border border-rose-200/80 bg-white/90 p-8 shadow-sm backdrop-blur-md">
-          <div className="mx-auto flex size-14 items-center justify-center rounded-full bg-rose-50 text-[#B76E79]">
+      <main className="flex min-h-[70svh] flex-col items-center justify-center bg-[#FDFBF7] dark:bg-background px-4 py-20 text-center sm:px-6 lg:px-8">
+        <div className="max-w-md space-y-5 rounded-3xl border border-rose-200/80 dark:border-border bg-white/90 dark:bg-card/90 p-8 shadow-sm backdrop-blur-md">
+          <div className="mx-auto flex size-14 items-center justify-center rounded-full bg-rose-50 dark:bg-rose-400/10 text-[#B76E79]">
             <Sparkles className="size-6" />
           </div>
-          <h1 className="font-heading text-2xl font-semibold text-stone-900">
+          <h1 className="font-heading text-2xl font-semibold text-stone-900 dark:text-foreground">
             Service Unavailable
           </h1>
-          <p className="text-sm leading-relaxed text-stone-600">
+          <p className="text-sm leading-relaxed text-stone-600 dark:text-muted-foreground">
             {error ??
               "The wedding service you are looking for may have been removed or is temporarily unavailable."}
           </p>
@@ -335,13 +335,13 @@ export default function BrowseServiceDetailsPage() {
   const minDateStr = tomorrow.toISOString().split("T")[0]
 
   return (
-    <main className="min-h-screen bg-[#FDFBF7] pb-24">
+    <main className="min-h-screen bg-[#FDFBF7] dark:bg-background pb-24">
       {/* Top Breadcrumb & Action Bar */}
-      <div className="border-b border-rose-200/60 bg-white/60 backdrop-blur-sm">
+      <div className="border-b border-rose-200/60 dark:border-border bg-white/60 dark:bg-card/60 backdrop-blur-sm">
         <div className="mx-auto flex max-w-7xl flex-wrap items-center justify-between gap-4 px-4 py-4 sm:px-6 lg:px-8">
           <Link
             href="/browse-services"
-            className="inline-flex items-center gap-2 rounded-full border border-rose-200/80 bg-white px-4 py-1.5 text-xs font-medium text-stone-700 shadow-2xs transition-all hover:border-[#B76E79] hover:bg-rose-50/70 hover:text-[#9F5863]"
+            className="inline-flex items-center gap-2 rounded-full border border-rose-200/80 dark:border-border bg-white dark:bg-card px-4 py-1.5 text-xs font-medium text-stone-700 dark:text-foreground/80 shadow-2xs transition-all hover:border-[#B76E79] hover:bg-rose-50/70 dark:hover:bg-input/40 hover:text-[#9F5863]"
           >
             <ArrowLeft className="size-3.5 text-[#B76E79]" />
             Back to Browse Services
@@ -353,7 +353,7 @@ export default function BrowseServiceDetailsPage() {
               variant="outline"
               size="sm"
               onClick={handleShare}
-              className="gap-1.5 rounded-full border-rose-200/80 bg-white text-xs text-stone-700 hover:border-rose-300 hover:bg-rose-50"
+              className="gap-1.5 rounded-full border-rose-200/80 dark:border-border bg-white dark:bg-card text-xs text-stone-700 dark:text-foreground/80 hover:border-rose-300 dark:hover:border-rose-300/40 hover:bg-rose-50 dark:hover:bg-input/40"
             >
               <Share2 className="size-3.5 text-[#B76E79]" />
               Share
@@ -367,31 +367,31 @@ export default function BrowseServiceDetailsPage() {
         {/* Service Header Info */}
         <div className="mb-8 space-y-3">
           <div className="flex flex-wrap items-center gap-2.5">
-            <Badge className="rounded-full border border-rose-200 bg-rose-50/90 px-3.5 py-1 text-xs font-semibold tracking-wider text-[#9F5863] uppercase">
+            <Badge className="rounded-full border border-rose-200 dark:border-border bg-rose-50/90 dark:bg-rose-400/10 px-3.5 py-1 text-xs font-semibold tracking-wider text-[#9F5863] dark:text-rose-300 uppercase">
               {service.category}
             </Badge>
-            <span className="inline-flex items-center gap-1 rounded-full border border-emerald-200/80 bg-emerald-50/80 px-3 py-1 text-xs font-medium text-emerald-800">
-              <ShieldCheck className="size-3.5 text-emerald-600" />
+            <span className="inline-flex items-center gap-1 rounded-full border border-emerald-200/80 dark:border-emerald-400/30 bg-emerald-50/80 dark:bg-emerald-500/10 px-3 py-1 text-xs font-medium text-emerald-800 dark:text-emerald-300">
+              <ShieldCheck className="size-3.5 text-emerald-600 dark:text-emerald-400" />
               Verified Listing
             </span>
           </div>
 
           <div className="flex flex-col justify-between gap-4 md:flex-row md:items-end">
             <div>
-              <h1 className="font-heading text-3xl leading-tight font-semibold tracking-tight text-stone-900 sm:text-4xl lg:text-5xl">
+              <h1 className="font-heading text-3xl leading-tight font-semibold tracking-tight text-stone-900 dark:text-foreground sm:text-4xl lg:text-5xl">
                 {service.serviceName}
               </h1>
-              <p className="mt-2.5 flex items-center gap-2 text-sm text-stone-600 sm:text-base">
+              <p className="mt-2.5 flex items-center gap-2 text-sm text-stone-600 dark:text-muted-foreground sm:text-base">
                 <MapPin className="size-4 shrink-0 text-[#B76E79]" />
                 <span>{service.location}</span>
               </p>
             </div>
 
-            <div className="shrink-0 rounded-2xl border border-rose-200/80 bg-white px-5 py-3 shadow-2xs md:text-right">
-              <p className="text-[11px] font-semibold tracking-wider text-stone-400 uppercase">
+            <div className="shrink-0 rounded-2xl border border-rose-200/80 dark:border-border bg-white dark:bg-card px-5 py-3 shadow-2xs md:text-right">
+              <p className="text-[11px] font-semibold tracking-wider text-stone-400 dark:text-muted-foreground/80 uppercase">
                 Starting Package
               </p>
-              <p className="font-heading text-2xl font-bold text-[#9F5863] sm:text-3xl">
+              <p className="font-heading text-2xl font-bold text-[#9F5863] dark:text-rose-300 sm:text-3xl">
                 {formatPrice(service.price)}
               </p>
             </div>
@@ -404,7 +404,7 @@ export default function BrowseServiceDetailsPage() {
           <div className="space-y-8 lg:col-span-7">
             {/* Primary Showcase Image */}
             <div className="space-y-3.5">
-              <div className="group relative aspect-[16/10] w-full overflow-hidden rounded-3xl border border-rose-200/80 bg-rose-50 shadow-md">
+              <div className="group relative aspect-[16/10] w-full overflow-hidden rounded-3xl border border-rose-200/80 dark:border-border bg-rose-50 dark:bg-rose-400/10 shadow-md">
                 <Image
                   src={currentImage}
                   alt={`${service.serviceName} - Photo ${activeImageIdx + 1}`}
@@ -427,7 +427,7 @@ export default function BrowseServiceDetailsPage() {
                       type="button"
                       onClick={handlePrevImage}
                       aria-label="Previous image"
-                      className="absolute top-1/2 left-3.5 flex size-10 -translate-y-1/2 items-center justify-center rounded-full border border-white/40 bg-white/85 text-stone-800 shadow-md backdrop-blur-md transition-all hover:scale-105 hover:bg-white"
+                      className="absolute top-1/2 left-3.5 flex size-10 -translate-y-1/2 items-center justify-center rounded-full border border-white/40 bg-white/85 dark:bg-card/85 text-stone-800 dark:text-foreground shadow-md backdrop-blur-md transition-all hover:scale-105 hover:bg-white dark:hover:bg-input/40"
                     >
                       <ChevronLeft className="size-5" />
                     </button>
@@ -435,7 +435,7 @@ export default function BrowseServiceDetailsPage() {
                       type="button"
                       onClick={handleNextImage}
                       aria-label="Next image"
-                      className="absolute top-1/2 right-3.5 flex size-10 -translate-y-1/2 items-center justify-center rounded-full border border-white/40 bg-white/85 text-stone-800 shadow-md backdrop-blur-md transition-all hover:scale-105 hover:bg-white"
+                      className="absolute top-1/2 right-3.5 flex size-10 -translate-y-1/2 items-center justify-center rounded-full border border-white/40 bg-white/85 dark:bg-card/85 text-stone-800 dark:text-foreground shadow-md backdrop-blur-md transition-all hover:scale-105 hover:bg-white dark:hover:bg-input/40"
                     >
                       <ChevronRight className="size-5" />
                     </button>
@@ -475,52 +475,52 @@ export default function BrowseServiceDetailsPage() {
             </div>
 
             {/* Service Highlights Section (Replaced generic bullet points) */}
-            <section className="rounded-3xl border border-rose-200/75 bg-white p-6 shadow-2xs sm:p-8">
+            <section className="rounded-3xl border border-rose-200/75 dark:border-border bg-white dark:bg-card p-6 shadow-2xs sm:p-8">
               <div className="mb-4 flex items-center gap-2">
                 <Sparkles className="size-4 text-[#B76E79]" />
-                <h2 className="font-heading text-2xl font-semibold text-stone-900">
+                <h2 className="font-heading text-2xl font-semibold text-stone-900 dark:text-foreground">
                   Service Highlights &amp; Inclusions
                 </h2>
               </div>
 
-              <div className="prose prose-stone max-w-none text-sm leading-relaxed whitespace-pre-line text-stone-600 sm:text-base">
+              <div className="prose prose-stone max-w-none text-sm leading-relaxed whitespace-pre-line text-stone-600 dark:text-muted-foreground sm:text-base">
                 {service.description ||
                   "Tailored wedding service crafted with meticulous attention to detail to make your celebration unforgettable."}
               </div>
 
               {/* Curated Wedding Feature Pills */}
-              <div className="mt-7 grid gap-4 border-t border-rose-100 pt-6 sm:grid-cols-3">
-                <div className="flex items-start gap-3 rounded-2xl bg-[#FDFBF7] p-3.5 ring-1 ring-rose-100">
+              <div className="mt-7 grid gap-4 border-t border-rose-100 dark:border-border pt-6 sm:grid-cols-3">
+                <div className="flex items-start gap-3 rounded-2xl bg-[#FDFBF7] dark:bg-background p-3.5 ring-1 ring-rose-100 dark:ring-border">
                   <CalendarHeart className="mt-0.5 size-5 shrink-0 text-[#B76E79]" />
                   <div>
-                    <p className="text-xs font-semibold text-stone-800">
+                    <p className="text-xs font-semibold text-stone-800 dark:text-foreground">
                       Tailored Planning
                     </p>
-                    <p className="mt-0.5 text-xs text-stone-500">
+                    <p className="mt-0.5 text-xs text-stone-500 dark:text-muted-foreground">
                       Customized to your vision
                     </p>
                   </div>
                 </div>
 
-                <div className="flex items-start gap-3 rounded-2xl bg-[#FDFBF7] p-3.5 ring-1 ring-rose-100">
+                <div className="flex items-start gap-3 rounded-2xl bg-[#FDFBF7] dark:bg-background p-3.5 ring-1 ring-rose-100 dark:ring-border">
                   <ShieldCheck className="mt-0.5 size-5 shrink-0 text-[#B76E79]" />
                   <div>
-                    <p className="text-xs font-semibold text-stone-800">
+                    <p className="text-xs font-semibold text-stone-800 dark:text-foreground">
                       Secure Booking
                     </p>
-                    <p className="mt-0.5 text-xs text-stone-500">
+                    <p className="mt-0.5 text-xs text-stone-500 dark:text-muted-foreground">
                       Direct vendor confirmation
                     </p>
                   </div>
                 </div>
 
-                <div className="flex items-start gap-3 rounded-2xl bg-[#FDFBF7] p-3.5 ring-1 ring-rose-100">
+                <div className="flex items-start gap-3 rounded-2xl bg-[#FDFBF7] dark:bg-background p-3.5 ring-1 ring-rose-100 dark:ring-border">
                   <Clock className="mt-0.5 size-5 shrink-0 text-[#B76E79]" />
                   <div>
-                    <p className="text-xs font-semibold text-stone-800">
+                    <p className="text-xs font-semibold text-stone-800 dark:text-foreground">
                       Priority Support
                     </p>
-                    <p className="mt-0.5 text-xs text-stone-500">
+                    <p className="mt-0.5 text-xs text-stone-500 dark:text-muted-foreground">
                       Dedicated wedding concierge
                     </p>
                   </div>
@@ -529,17 +529,17 @@ export default function BrowseServiceDetailsPage() {
             </section>
 
             {/* Vendor Information Card (Fetched live from /users/:id) */}
-            <section className="rounded-3xl border border-rose-200/75 bg-gradient-to-br from-white via-white to-rose-50/40 p-6 shadow-2xs sm:p-8">
+            <section className="rounded-3xl border border-rose-200/75 dark:border-border bg-gradient-to-br from-white dark:from-card via-white dark:via-card to-rose-50/40 dark:to-transparent p-6 shadow-2xs sm:p-8">
               <p className="text-xs font-semibold tracking-[0.18em] text-[#B76E79] uppercase">
                 Hosted &amp; Managed By
               </p>
-              <h2 className="mt-1 font-heading text-2xl font-semibold text-stone-900">
+              <h2 className="mt-1 font-heading text-2xl font-semibold text-stone-900 dark:text-foreground">
                 Vendor Information
               </h2>
 
               <div className="mt-5 flex flex-col justify-between gap-5 sm:flex-row sm:items-center">
                 <div className="flex items-center gap-4">
-                  <Avatar className="size-16 shadow-xs ring-2 ring-rose-200">
+                  <Avatar className="size-16 shadow-xs ring-2 ring-rose-200 dark:ring-border">
                     {vendorImage ? (
                       <AvatarImage
                         src={vendorImage}
@@ -554,30 +554,30 @@ export default function BrowseServiceDetailsPage() {
 
                   <div className="space-y-1">
                     <div className="flex flex-wrap items-center gap-2">
-                      <h3 className="font-heading text-xl font-semibold text-stone-900">
+                      <h3 className="font-heading text-xl font-semibold text-stone-900 dark:text-foreground">
                         {vendorName}
                       </h3>
-                      <span className="inline-flex items-center gap-1 rounded-full bg-rose-100/80 px-2.5 py-0.5 text-[11px] font-semibold text-[#9F5863]">
+                      <span className="inline-flex items-center gap-1 rounded-full bg-rose-100/80 dark:bg-rose-400/10 px-2.5 py-0.5 text-[11px] font-semibold text-[#9F5863] dark:text-rose-300">
                         <ShieldCheck className="size-3 text-[#B76E79]" />
                         Verified Vendor
                       </span>
                     </div>
 
                     {vendorEmail ? (
-                      <p className="flex items-center gap-1.5 text-sm text-stone-500">
+                      <p className="flex items-center gap-1.5 text-sm text-stone-500 dark:text-muted-foreground">
                         <Mail className="size-3.5 text-[#B76E79]" />
                         <span>{vendorEmail}</span>
                       </p>
                     ) : (
-                      <p className="text-sm text-stone-500">
+                      <p className="text-sm text-stone-500 dark:text-muted-foreground">
                         Official WedPlan Partner in {service.location}
                       </p>
                     )}
                   </div>
                 </div>
 
-                <div className="flex items-center gap-2 text-xs text-stone-500 sm:text-right">
-                  <span className="rounded-xl border border-rose-200/70 bg-white px-3.5 py-2 font-medium text-stone-700">
+                <div className="flex items-center gap-2 text-xs text-stone-500 dark:text-muted-foreground sm:text-right">
+                  <span className="rounded-xl border border-rose-200/70 dark:border-border bg-white dark:bg-card px-3.5 py-2 font-medium text-stone-700 dark:text-foreground/80">
                     Category: {service.category}
                   </span>
                 </div>
@@ -587,41 +587,41 @@ export default function BrowseServiceDetailsPage() {
 
           {/* RIGHT COLUMN (5 cols): Sticky Luxury Booking Card */}
           <aside className="lg:sticky lg:top-24 lg:col-span-5">
-            <div className="overflow-hidden rounded-3xl border border-rose-200/90 bg-white shadow-xl shadow-rose-950/5">
+            <div className="overflow-hidden rounded-3xl border border-rose-200/90 dark:border-border bg-white dark:bg-card shadow-xl shadow-rose-950/5 dark:shadow-black/20">
               {/* Top Rose-Gold Accent Header */}
-              <div className="border-b border-rose-100 bg-gradient-to-r from-rose-50/90 via-[#FDFBF7] to-amber-50/40 px-6 py-5 sm:px-7">
+              <div className="border-b border-rose-100 dark:border-border bg-gradient-to-r from-rose-50/90 dark:from-rose-400/10 via-[#FDFBF7] dark:via-background to-amber-50/40 dark:to-transparent px-6 py-5 sm:px-7">
                 <div className="flex items-baseline justify-between gap-2">
                   <div>
-                    <span className="text-xs font-semibold tracking-wider text-[#9F5863] uppercase">
+                    <span className="text-xs font-semibold tracking-wider text-[#9F5863] dark:text-rose-300 uppercase">
                       Reserve This Service
                     </span>
                     <div className="mt-1 flex items-baseline gap-1.5">
-                      <span className="font-heading text-3xl font-bold text-stone-900">
+                      <span className="font-heading text-3xl font-bold text-stone-900 dark:text-foreground">
                         {formatPrice(service.price)}
                       </span>
-                      <span className="text-xs text-stone-500">
+                      <span className="text-xs text-stone-500 dark:text-muted-foreground">
                         / full package
                       </span>
                     </div>
                   </div>
-                  <div className="flex size-10 items-center justify-center rounded-full bg-white text-[#B76E79] shadow-2xs ring-1 ring-rose-200/70">
-                    <Heart className="size-5 fill-rose-100" />
+                  <div className="flex size-10 items-center justify-center rounded-full bg-white dark:bg-card text-[#B76E79] shadow-2xs ring-1 ring-rose-200/70 dark:ring-border">
+                    <Heart className="size-5 fill-rose-100 dark:fill-rose-400/20" />
                   </div>
                 </div>
               </div>
 
               <div className="p-6 sm:p-7">
                 {bookedSuccess ? (
-                  <div className="space-y-4 rounded-2xl border border-emerald-200 bg-emerald-50/60 p-6 text-center">
-                    <div className="mx-auto flex size-12 items-center justify-center rounded-full bg-emerald-100 text-emerald-700">
+                  <div className="space-y-4 rounded-2xl border border-emerald-200 dark:border-emerald-400/30 bg-emerald-50/60 dark:bg-emerald-500/10 p-6 text-center">
+                    <div className="mx-auto flex size-12 items-center justify-center rounded-full bg-emerald-100 dark:bg-emerald-500/10 text-emerald-700 dark:text-emerald-300">
                       <CheckCircle2 className="size-6" />
                     </div>
-                    <h3 className="font-heading text-xl font-semibold text-stone-900">
+                    <h3 className="font-heading text-xl font-semibold text-stone-900 dark:text-foreground">
                       Booking Request Sent!
                     </h3>
-                    <p className="text-sm leading-relaxed text-stone-600">
+                    <p className="text-sm leading-relaxed text-stone-600 dark:text-muted-foreground">
                       Your request for{" "}
-                      <span className="font-medium text-stone-800">
+                      <span className="font-medium text-stone-800 dark:text-foreground">
                         {service.serviceName}
                       </span>{" "}
                       on <span className="font-medium">{eventDate}</span> has
@@ -643,7 +643,7 @@ export default function BrowseServiceDetailsPage() {
                           setEventLocation("")
                           setMessage("")
                         }}
-                        className="w-full rounded-full text-xs text-stone-600 hover:bg-rose-50"
+                        className="w-full rounded-full text-xs text-stone-600 dark:text-muted-foreground hover:bg-rose-50 dark:hover:bg-input/40"
                       >
                         Request Another Date
                       </Button>
@@ -655,7 +655,7 @@ export default function BrowseServiceDetailsPage() {
                     <div className="space-y-1.5">
                       <Label
                         htmlFor="eventDate"
-                        className="flex items-center gap-1.5 text-xs font-semibold tracking-wide text-stone-700 uppercase"
+                        className="flex items-center gap-1.5 text-xs font-semibold tracking-wide text-stone-700 dark:text-foreground/80 uppercase"
                       >
                         <CalendarHeart className="size-3.5 text-[#B76E79]" />
                         Wedding / Event Date *
@@ -667,7 +667,7 @@ export default function BrowseServiceDetailsPage() {
                         required
                         value={eventDate}
                         onChange={(e) => setEventDate(e.target.value)}
-                        className="h-11 rounded-xl border-rose-200/90 bg-[#FDFBF7]/60 text-stone-800 focus-visible:border-[#B76E79] focus-visible:ring-[#B76E79]/25"
+                        className="h-11 rounded-xl border-rose-200/90 dark:border-border bg-[#FDFBF7]/60 dark:bg-background/60 text-stone-800 dark:text-foreground focus-visible:border-[#B76E79] focus-visible:ring-[#B76E79]/25"
                       />
                     </div>
 
@@ -675,7 +675,7 @@ export default function BrowseServiceDetailsPage() {
                     <div className="space-y-1.5">
                       <Label
                         htmlFor="eventLocation"
-                        className="flex items-center gap-1.5 text-xs font-semibold tracking-wide text-stone-700 uppercase"
+                        className="flex items-center gap-1.5 text-xs font-semibold tracking-wide text-stone-700 dark:text-foreground/80 uppercase"
                       >
                         <MapPin className="size-3.5 text-[#B76E79]" />
                         Event Location *
@@ -687,7 +687,7 @@ export default function BrowseServiceDetailsPage() {
                         placeholder="e.g. Rosewood Lakeside, Dhaka"
                         value={eventLocation}
                         onChange={(e) => setEventLocation(e.target.value)}
-                        className="h-11 rounded-xl border-rose-200/90 bg-[#FDFBF7]/60 text-stone-800 focus-visible:border-[#B76E79] focus-visible:ring-[#B76E79]/25"
+                        className="h-11 rounded-xl border-rose-200/90 dark:border-border bg-[#FDFBF7]/60 dark:bg-background/60 text-stone-800 dark:text-foreground focus-visible:border-[#B76E79] focus-visible:ring-[#B76E79]/25"
                       />
                     </div>
 
@@ -695,7 +695,7 @@ export default function BrowseServiceDetailsPage() {
                     <div className="space-y-1.5">
                       <Label
                         htmlFor="message"
-                        className="flex items-center gap-1.5 text-xs font-semibold tracking-wide text-stone-700 uppercase"
+                        className="flex items-center gap-1.5 text-xs font-semibold tracking-wide text-stone-700 dark:text-foreground/80 uppercase"
                       >
                         <MessageSquare className="size-3.5 text-[#B76E79]" />
                         Message for Vendor (Optional)
@@ -706,27 +706,27 @@ export default function BrowseServiceDetailsPage() {
                         placeholder="Tell the vendor about your guest count, theme or any special requests..."
                         value={message}
                         onChange={(e) => setMessage(e.target.value)}
-                        className="resize-none rounded-xl border-rose-200/90 bg-[#FDFBF7]/60 text-sm text-stone-800 focus-visible:border-[#B76E79] focus-visible:ring-[#B76E79]/25"
+                        className="resize-none rounded-xl border-rose-200/90 dark:border-border bg-[#FDFBF7]/60 dark:bg-background/60 text-sm text-stone-800 dark:text-foreground focus-visible:border-[#B76E79] focus-visible:ring-[#B76E79]/25"
                       />
                     </div>
 
                     {/* Price Breakdown Summary */}
-                    <div className="space-y-2 rounded-2xl border border-rose-100 bg-[#FDFBF7] p-4 text-sm">
-                      <div className="flex items-center justify-between text-stone-600">
+                    <div className="space-y-2 rounded-2xl border border-rose-100 dark:border-border bg-[#FDFBF7] dark:bg-background p-4 text-sm">
+                      <div className="flex items-center justify-between text-stone-600 dark:text-muted-foreground">
                         <span>Service Package</span>
-                        <span className="font-medium text-stone-800">
+                        <span className="font-medium text-stone-800 dark:text-foreground">
                           {formatPrice(service.price)}
                         </span>
                       </div>
-                      <div className="flex items-center justify-between text-stone-600">
+                      <div className="flex items-center justify-between text-stone-600 dark:text-muted-foreground">
                         <span>WedPlan Booking Fee</span>
-                        <span className="font-medium text-emerald-700">
+                        <span className="font-medium text-emerald-700 dark:text-emerald-300">
                           Free
                         </span>
                       </div>
-                      <div className="flex items-center justify-between border-t border-rose-200/60 pt-2 text-base font-semibold text-stone-900">
+                      <div className="flex items-center justify-between border-t border-rose-200/60 dark:border-border pt-2 text-base font-semibold text-stone-900 dark:text-foreground">
                         <span>Estimated Total</span>
-                        <span className="text-[#9F5863]">
+                        <span className="text-[#9F5863] dark:text-rose-300">
                           {formatPrice(service.price)}
                         </span>
                       </div>
@@ -738,11 +738,11 @@ export default function BrowseServiceDetailsPage() {
                         <Button
                           type="button"
                           render={<Link href="/sign-in" />}
-                          className="h-12 w-full rounded-full bg-[#B76E79] text-base font-medium text-white shadow-md shadow-rose-900/10 hover:bg-[#a25c67]"
+                          className="h-12 w-full rounded-full bg-[#B76E79] text-base font-medium text-white shadow-md shadow-rose-900/10 dark:shadow-black/20 hover:bg-[#a25c67]"
                         >
                           Sign In to Book Service
                         </Button>
-                        <p className="text-center text-xs text-stone-500">
+                        <p className="text-center text-xs text-stone-500 dark:text-muted-foreground">
                           You won&apos;t be charged until the vendor confirms
                           availability.
                         </p>
@@ -752,7 +752,7 @@ export default function BrowseServiceDetailsPage() {
                         <Button
                           type="submit"
                           disabled={bookingSubmitting}
-                          className="h-12 w-full gap-2 rounded-full bg-[#B76E79] text-base font-medium text-white shadow-md shadow-rose-900/10 transition-all hover:bg-[#a25c67] hover:shadow-lg"
+                          className="h-12 w-full gap-2 rounded-full bg-[#B76E79] text-base font-medium text-white shadow-md shadow-rose-900/10 dark:shadow-black/20 transition-all hover:bg-[#a25c67] hover:shadow-lg"
                         >
                           {bookingSubmitting ? (
                             <>
@@ -766,9 +766,9 @@ export default function BrowseServiceDetailsPage() {
                             </>
                           )}
                         </Button>
-                        <p className="text-center text-xs text-stone-500">
+                        <p className="text-center text-xs text-stone-500 dark:text-muted-foreground">
                           Direct request sent to{" "}
-                          <span className="font-medium text-stone-700">
+                          <span className="font-medium text-stone-700 dark:text-foreground/80">
                             {vendorName}
                           </span>
                           .

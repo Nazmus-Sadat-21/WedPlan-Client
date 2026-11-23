@@ -86,7 +86,7 @@ export function Banner() {
           >
             <Link
               href="/browse-services"
-              className="group inline-flex h-12 items-center justify-center gap-2 rounded-full bg-[#B76E79] px-8 text-base font-medium text-[#fffdf8] shadow-lg shadow-rose-950/30 transition-all hover:bg-[#a25c67] hover:shadow-xl focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white"
+              className="group inline-flex h-12 items-center justify-center gap-2 rounded-full bg-[#B76E79] px-8 text-base font-medium text-[#fffdf8] shadow-lg shadow-rose-950/30 dark:shadow-black/20 transition-all hover:bg-[#a25c67] hover:shadow-xl focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white"
             >
               Explore Wedding Services
               <ArrowRight className="size-4 transition-transform group-hover:translate-x-1" />
@@ -94,7 +94,7 @@ export function Banner() {
 
             <Link
               href="/browse-services?category=Wedding%20Venues"
-              className="inline-flex h-12 items-center justify-center gap-2 rounded-full border border-rose-200/90 bg-white/90 px-8 text-base font-medium text-stone-800 shadow-xs backdrop-blur-md transition-all hover:border-rose-300 hover:bg-rose-50/90 hover:text-stone-950 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white"
+              className="inline-flex h-12 items-center justify-center gap-2 rounded-full border border-rose-200/90 dark:border-border bg-white/90 dark:bg-card/90 px-8 text-base font-medium text-stone-800 dark:text-foreground shadow-xs backdrop-blur-md transition-all hover:border-rose-300 dark:hover:border-rose-300/40 hover:bg-rose-50/90 dark:hover:bg-input/40 hover:text-stone-950 dark:hover:text-foreground focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white"
             >
               <Search className="size-4 text-[#B76E79]" />
               Find a Venue

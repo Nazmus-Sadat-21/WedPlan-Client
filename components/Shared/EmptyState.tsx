@@ -25,7 +25,7 @@ export function EmptyState({
       )}
     >
       {Icon ? (
-        <div className="flex size-12 items-center justify-center rounded-full bg-champagne-500/15 text-champagne-700">
+        <div className="flex size-12 items-center justify-center rounded-full bg-champagne-500/15 text-champagne-700 dark:text-champagne-300">
           <Icon className="size-6" />
         </div>
       ) : null}

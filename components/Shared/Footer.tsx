@@ -59,7 +59,7 @@ const SOCIAL_LINKS = [
 
 export function Footer() {
   return (
-    <footer className="relative overflow-hidden border-t border-rose-200/50 bg-[#2C2426] text-stone-200">
+    <footer className="relative overflow-hidden border-t border-rose-200/50 bg-[#2C2426] dark:border-border text-stone-200">
       {/* Soft background glow accents */}
       <div
         aria-hidden="true"

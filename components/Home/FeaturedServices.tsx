@@ -93,15 +93,15 @@ export function FeaturedServices() {
   }
 
   return (
-    <section className="relative overflow-hidden bg-[#FDFBF7] py-16 sm:py-20 lg:py-24">
+    <section className="relative overflow-hidden bg-[#FDFBF7] dark:bg-background py-16 sm:py-20 lg:py-24">
       {/* Soft background glow accents */}
       <div
         aria-hidden="true"
-        className="pointer-events-none absolute -top-20 right-1/4 -z-10 h-80 w-80 rounded-full bg-rose-100/30 blur-3xl"
+        className="pointer-events-none absolute -top-20 right-1/4 -z-10 h-80 w-80 rounded-full bg-rose-100/30 dark:bg-rose-400/10 blur-3xl"
       />
       <div
         aria-hidden="true"
-        className="pointer-events-none absolute bottom-10 left-10 -z-10 h-72 w-72 rounded-full bg-amber-100/20 blur-3xl"
+        className="pointer-events-none absolute bottom-10 left-10 -z-10 h-72 w-72 rounded-full bg-amber-100/20 dark:bg-amber-300/5 blur-3xl"
       />
 
       <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
@@ -133,7 +133,7 @@ export function FeaturedServices() {
                 <Button
                   onClick={retry}
                   variant="outline"
-                  className="gap-2 rounded-full border-rose-200 hover:bg-rose-50"
+                  className="gap-2 rounded-full border-rose-200 dark:border-border hover:bg-rose-50 dark:hover:bg-input/40"
                 >
                   <RotateCcw className="size-4" />
                   Try again
@@ -149,7 +149,7 @@ export function FeaturedServices() {
                 <Button
                   render={<Link href="/browse-services" />}
                   variant="outline"
-                  className="rounded-full border-rose-200 hover:bg-rose-50"
+                  className="rounded-full border-rose-200 dark:border-border hover:bg-rose-50 dark:hover:bg-input/40"
                 >
                   Browse all services
                   <ArrowRight className="size-4" />
@@ -178,7 +178,7 @@ export function FeaturedServices() {
             size="lg"
             variant="outline"
             render={<Link href="/browse-services" />}
-            className="h-12 gap-2 rounded-full border-rose-200/90 bg-white/80 px-8 text-base font-medium text-stone-700 shadow-xs backdrop-blur-md transition-all hover:border-rose-300 hover:bg-rose-50/80 hover:text-stone-900"
+            className="h-12 gap-2 rounded-full border-rose-200/90 dark:border-border bg-white/80 dark:bg-card/80 px-8 text-base font-medium text-stone-700 dark:text-foreground/80 shadow-xs backdrop-blur-md transition-all hover:border-rose-300 dark:hover:border-rose-300/40 hover:bg-rose-50/80 dark:hover:bg-input/40 hover:text-stone-900 dark:hover:text-foreground"
           >
             View All Services
             <ArrowRight className="size-4" />

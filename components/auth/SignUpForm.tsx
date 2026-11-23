@@ -182,6 +182,16 @@ export function SignUpForm() {
       })
 
       if (error) {
+        const code = String((error as { code?: unknown }).code ?? "")
+        const status = Number((error as { status?: unknown }).status ?? 0)
+
+        if (status === 503 || code === "AUTH_UNAVAILABLE") {
+          toast.error(
+            "Account creation is temporarily unavailable. Please try again in a moment."
+          )
+          return
+        }
+
         toast.error(error.message ?? "Could not create your account.")
         return
       }

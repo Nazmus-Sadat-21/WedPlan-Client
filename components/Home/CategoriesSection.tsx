@@ -24,15 +24,15 @@ const item = {
 
 export function CategoriesSection() {
   return (
-    <section className="relative overflow-hidden border-y border-rose-200/50 bg-[#FDFBF7] py-16 sm:py-20 lg:py-24">
+    <section className="relative overflow-hidden border-y border-rose-200/50 dark:border-border bg-[#FDFBF7] dark:bg-background py-16 sm:py-20 lg:py-24">
       {/* Soft background glow accents */}
       <div
         aria-hidden="true"
-        className="pointer-events-none absolute top-1/2 left-0 -z-10 h-72 w-72 -translate-y-1/2 rounded-full bg-rose-100/30 blur-3xl"
+        className="pointer-events-none absolute top-1/2 left-0 -z-10 h-72 w-72 -translate-y-1/2 rounded-full bg-rose-100/30 dark:bg-rose-400/10 blur-3xl"
       />
       <div
         aria-hidden="true"
-        className="pointer-events-none absolute right-0 bottom-0 -z-10 h-80 w-80 rounded-full bg-amber-100/20 blur-3xl"
+        className="pointer-events-none absolute right-0 bottom-0 -z-10 h-80 w-80 rounded-full bg-amber-100/20 dark:bg-amber-300/5 blur-3xl"
       />
 
       <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
@@ -60,7 +60,7 @@ export function CategoriesSection() {
             <motion.li key={category.name} variants={item}>
               <Link
                 href={`/browse-services?category=${encodeURIComponent(category.name)}`}
-                className="group relative block overflow-hidden rounded-2xl border border-rose-200/75 bg-white shadow-xs transition-all duration-300 hover:-translate-y-1.5 hover:border-rose-300 hover:shadow-xl hover:shadow-rose-950/5 focus-visible:outline-none"
+                className="group relative block overflow-hidden rounded-2xl border border-rose-200/75 dark:border-border bg-white dark:bg-card shadow-xs transition-all duration-300 hover:-translate-y-1.5 hover:border-rose-300 dark:hover:border-rose-300/40 hover:shadow-xl hover:shadow-rose-950/5 dark:hover:shadow-black/30 focus-visible:outline-none"
               >
                 <div className="relative aspect-[4/5] sm:aspect-[5/4] lg:aspect-[4/3]">
                   <Image

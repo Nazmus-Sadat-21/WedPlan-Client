@@ -2,7 +2,9 @@ import Image from "next/image"
 import Link from "next/link"
 import { Heart } from "lucide-react"
 
+import { BackButton } from "@/components/Shared/BackButton"
 import { Logo } from "@/components/Shared/Logo"
+import { ThemeToggle } from "@/components/Shared/ThemeToggle"
 import { RedirectIfAuthed } from "@/components/auth/RedirectIfAuthed"
 
 const AUTH_IMAGE_URL =
@@ -67,6 +69,10 @@ export default function AuthLayout({
 
         {/* Form panel */}
         <div className="relative flex flex-col px-4 py-8 sm:px-8">
+          <div className="mx-auto flex w-full max-w-md items-center justify-between">
+            <BackButton />
+            <ThemeToggle />
+          </div>
           <div className="mx-auto flex w-full max-w-md flex-1 flex-col justify-center py-8">
             <div className="mb-8 flex justify-center lg:hidden">
               <div className="rounded-2xl bg-white/70 p-2 shadow-sm ring-1 ring-rose-100 backdrop-blur-sm">

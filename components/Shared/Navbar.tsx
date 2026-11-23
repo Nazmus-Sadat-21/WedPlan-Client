@@ -34,6 +34,7 @@ import {
 } from "@/components/ui/sheet"
 import { Skeleton } from "@/components/ui/skeleton"
 import { Logo } from "@/components/Shared/Logo"
+import { ThemeToggle } from "@/components/Shared/ThemeToggle"
 import { signOut, useSession } from "@/lib/auth-client"
 import { dashboardPathForRole } from "@/lib/roles"
 import { getUserInitials } from "@/lib/format"
@@ -45,7 +46,7 @@ const NAV_LINKS = [
 ] as const
 
 const menuItemClassName =
-  "group cursor-pointer gap-3 rounded-xl px-2.5 py-2 text-stone-700 transition-colors focus:bg-rose-50/90 focus:text-[#9F5863] data-highlighted:bg-rose-50/90 data-highlighted:text-[#9F5863]"
+  "group cursor-pointer gap-3 rounded-xl px-2.5 py-2 text-stone-700 dark:text-foreground transition-colors focus:bg-rose-50/90 focus:text-[#9F5863] data-highlighted:bg-rose-50/90 data-highlighted:text-[#9F5863]"
 
 const menuIconClassName =
   "flex size-9 shrink-0 items-center justify-center rounded-xl bg-rose-50 text-[#B76E79] ring-1 ring-rose-100 transition-all duration-200 group-focus:bg-[#B76E79] group-focus:text-white group-focus:ring-[#B76E79] group-data-highlighted:bg-[#B76E79] group-data-highlighted:text-white group-data-highlighted:ring-[#B76E79]"
@@ -94,8 +95,8 @@ export function Navbar() {
       className={cn(
         "sticky top-0 z-50 border-b transition-all duration-300",
         scrolled
-          ? "border-rose-200/70 bg-[#FDFBF7]/80 shadow-lg shadow-rose-950/5 backdrop-blur-xl"
-          : "border-rose-200/50 bg-[#FDFBF7]/95 shadow-none backdrop-blur-md"
+          ? "border-rose-200/70 bg-[#FDFBF7]/80 shadow-lg shadow-rose-950/5 backdrop-blur-xl dark:border-input dark:bg-background/80 dark:shadow-black/30"
+          : "border-rose-200/50 bg-[#FDFBF7]/95 shadow-none backdrop-blur-md dark:border-input dark:bg-background/95"
       )}
     >
       {/* Thin rose accent line along the top edge */}
@@ -114,7 +115,7 @@ export function Navbar() {
         <div className="flex items-center gap-8 lg:gap-10">
           <Logo />
 
-          <ul className="hidden items-center gap-1 rounded-full border border-rose-200/60 bg-white/60 p-1 shadow-2xs backdrop-blur-sm md:flex">
+          <ul className="hidden items-center gap-1 rounded-full border border-rose-200/60 bg-white/60 p-1 shadow-2xs backdrop-blur-sm md:flex dark:border-input dark:bg-white/5">
             {NAV_LINKS.map((link) => {
               const isActive = activeClass(link.href)
               return (
@@ -126,7 +127,7 @@ export function Navbar() {
                       "relative block rounded-full px-4 py-1.5 text-sm font-medium transition-colors duration-200",
                       isActive
                         ? "text-white"
-                        : "text-stone-600 hover:bg-rose-50 hover:text-stone-900"
+                        : "text-stone-600 hover:bg-rose-50 hover:text-stone-900 dark:text-muted-foreground dark:hover:bg-white/10 dark:hover:text-foreground"
                     )}
                   >
                     {isActive ? (
@@ -150,6 +151,7 @@ export function Navbar() {
 
         {/* Right: Desktop & Tablet Actions */}
         <div className="hidden items-center gap-3 md:flex">
+          <ThemeToggle />
           {isPending ? (
             <Skeleton className="h-10 w-44 rounded-full bg-rose-100/60" />
           ) : isAuthed ? (
@@ -158,7 +160,7 @@ export function Navbar() {
                 render={
                   <Button
                     variant="ghost"
-                    className="group h-11 gap-2.5 rounded-full border border-rose-200/80 bg-white/90 pr-3.5 pl-1.5 text-stone-700 shadow-2xs transition-all duration-200 hover:border-[#B76E79]/50 hover:bg-white hover:text-stone-900 hover:shadow-md hover:shadow-rose-950/5 data-[state=open]:border-[#B76E79]/60 data-[state=open]:shadow-md"
+                    className="group h-11 gap-2.5 rounded-full border border-rose-200/80 bg-white/90 pr-3.5 pl-1.5 text-stone-700 shadow-2xs transition-all duration-200 hover:border-[#B76E79]/50 hover:bg-white hover:text-stone-900 hover:shadow-md hover:shadow-rose-950/5 data-[state=open]:border-[#B76E79]/60 data-[state=open]:shadow-md dark:border-input dark:bg-white/5 dark:text-foreground dark:hover:bg-white/10"
                   />
                 }
               >
@@ -175,7 +177,7 @@ export function Navbar() {
                   </AvatarFallback>
                 </Avatar>
                 <div className="flex flex-col items-start text-left">
-                  <span className="max-w-28 truncate text-sm leading-none font-semibold text-stone-800">
+                  <span className="max-w-28 truncate text-sm leading-none font-semibold text-stone-800 dark:text-foreground">
                     {user?.name ?? "My account"}
                   </span>
                   {user?.role ? (
@@ -190,7 +192,7 @@ export function Navbar() {
               <DropdownMenuContent
                 align="end"
                 sideOffset={10}
-                className="w-80 overflow-hidden rounded-2xl border border-rose-200/80 bg-white/95 p-2 shadow-2xl shadow-rose-950/15 backdrop-blur-xl"
+                className="w-80 overflow-hidden rounded-2xl border border-rose-200/80 bg-white/95 p-2 shadow-2xl shadow-rose-950/15 backdrop-blur-xl dark:border-input dark:bg-popover/95"
               >
                 {/* Profile header card */}
                 <div className="relative mb-2 overflow-hidden rounded-xl border border-rose-200/60 bg-gradient-to-br from-[#2c1a1f] via-[#4a2b32] to-[#9F5863] p-4 text-white">
@@ -307,7 +309,7 @@ export function Navbar() {
               <Button
                 variant="ghost"
                 render={<Link href="/sign-in" />}
-                className="rounded-full px-5 text-sm font-medium text-stone-700 hover:bg-rose-50/90 hover:text-stone-900"
+                className="rounded-full px-5 text-sm font-medium text-stone-700 hover:bg-rose-50/90 hover:text-stone-900 dark:text-foreground dark:hover:bg-white/10"
               >
                 Sign In
               </Button>
@@ -324,6 +326,7 @@ export function Navbar() {
 
         {/* Mobile Menu Drawer */}
         <div className="flex items-center gap-2 md:hidden">
+          <ThemeToggle className="size-9" />
           {!isPending && isAuthed ? (
             <Link
               href={`${dashboardHref}/profile-settings`}
@@ -351,7 +354,7 @@ export function Navbar() {
                 <Button
                   variant="ghost"
                   size="icon"
-                  className="rounded-full border border-rose-200/80 bg-white/80 text-stone-700 hover:bg-rose-50 hover:text-[#B76E79]"
+                  className="rounded-full border border-rose-200/80 bg-white/80 text-stone-700 hover:bg-rose-50 hover:text-[#B76E79] dark:border-input dark:bg-white/5 dark:text-foreground"
                   aria-label="Open navigation menu"
                 />
               }
@@ -361,7 +364,7 @@ export function Navbar() {
 
             <SheetContent
               side="right"
-              className="flex w-[85vw] max-w-sm flex-col border-l-rose-200/70 bg-[#FDFBF7] p-0"
+              className="flex w-[85vw] max-w-sm flex-col border-l-rose-200/70 bg-[#FDFBF7] p-0 dark:border-input dark:bg-background"
             >
               <SheetHeader className="border-b border-rose-100/80 px-5 py-4 text-left">
                 <SheetTitle>
@@ -425,7 +428,7 @@ export function Navbar() {
                           "flex items-center rounded-xl px-3.5 py-2.5 text-sm font-medium transition-all",
                           isActive
                             ? "bg-gradient-to-r from-[#B76E79] to-[#C58970] text-white shadow-md shadow-rose-900/10"
-                            : "text-stone-600 hover:bg-rose-50/80 hover:text-stone-900"
+                            : "text-stone-600 hover:bg-rose-50/80 hover:text-stone-900 dark:text-muted-foreground dark:hover:bg-white/10 dark:hover:text-foreground"
                         )}
                       >
                         {link.label}
@@ -448,7 +451,7 @@ export function Navbar() {
                           "flex items-center gap-3 rounded-xl px-3.5 py-2.5 text-sm font-medium transition-all",
                           activeClass(dashboardHref)
                             ? "bg-rose-100/80 text-[#9F5863]"
-                            : "text-stone-600 hover:bg-rose-50/80 hover:text-stone-900"
+                            : "text-stone-600 hover:bg-rose-50/80 hover:text-stone-900 dark:text-muted-foreground dark:hover:bg-white/10 dark:hover:text-foreground"
                         )}
                       >
                         <LayoutDashboard className="size-4 text-[#B76E79]" />
@@ -462,7 +465,7 @@ export function Navbar() {
                         "flex items-center gap-3 rounded-xl px-3.5 py-2.5 text-sm font-medium transition-all",
                         activeClass(`${dashboardHref}/profile-settings`)
                           ? "bg-rose-100/80 text-[#9F5863]"
-                          : "text-stone-600 hover:bg-rose-50/80 hover:text-stone-900"
+                          : "text-stone-600 hover:bg-rose-50/80 hover:text-stone-900 dark:text-muted-foreground dark:hover:bg-white/10 dark:hover:text-foreground"
                       )}
                     >
                       <Settings className="size-4 text-[#B76E79]" />
@@ -473,7 +476,7 @@ export function Navbar() {
               </div>
 
               {/* Sticky Footer Action */}
-              <div className="border-t border-rose-100 bg-white/60 p-4">
+              <div className="border-t border-rose-100 bg-white/60 p-4 dark:border-input dark:bg-card/60">
                 {isPending ? (
                   <Skeleton className="h-11 w-full rounded-full bg-rose-100/60" />
                 ) : isAuthed ? (

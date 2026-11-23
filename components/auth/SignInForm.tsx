@@ -16,7 +16,7 @@ import { authClient } from "@/lib/auth-client"
 import { dashboardPathForRole } from "@/lib/roles"
 import { validateEmail, validateRequired } from "@/lib/validation"
 
-export function SignInForm() {
+export function SignInForm({ nextPath }: { nextPath?: string }) {
   const router = useRouter()
   const [email, setEmail] = useState("")
   const [password, setPassword] = useState("")
@@ -48,7 +48,25 @@ export function SignInForm() {
 
     if (error) {
       setSubmitting(false)
-      toast.error(error.message ?? "Invalid email or password.")
+
+      const code = String((error as { code?: unknown }).code ?? "")
+      const status = Number((error as { status?: unknown }).status ?? 0)
+
+      if (status === 503 || code === "AUTH_UNAVAILABLE") {
+        toast.error(
+          "Sign-in is temporarily unavailable. Please try again in a moment."
+        )
+        return
+      }
+
+      if (status === 429) {
+        toast.error("Too many attempts. Please wait a moment and try again.")
+        return
+      }
+
+      toast.error(
+        "Invalid email or password. If you signed up with Google, use “Continue with Google” instead."
+      )
       return
     }
 
@@ -58,7 +76,7 @@ export function SignInForm() {
 }
     toast.success("Welcome back!")
     setSubmitting(false)
-    router.push(dashboardPathForRole(data?.user?.role))
+    router.push(nextPath ?? dashboardPathForRole(data?.user?.role))
   }
 
   return (

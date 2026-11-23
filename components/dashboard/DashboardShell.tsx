@@ -15,7 +15,9 @@ import {
   SheetTitle,
   SheetTrigger,
 } from "@/components/ui/sheet"
+import { BackButton } from "@/components/Shared/BackButton"
 import { Logo } from "@/components/Shared/Logo"
+import { ThemeToggle } from "@/components/Shared/ThemeToggle"
 import { DASHBOARD_NAV, type NavItem } from "@/components/dashboard/nav"
 import { DashboardLoader } from "@/components/dashboard/RoleGate"
 import { signOut, useSession } from "@/lib/auth-client"
@@ -134,8 +136,9 @@ function SidebarContent({
 }) {
   return (
     <>
-      <div className="p-4 pb-2">
+      <div className="flex items-center justify-between gap-2 p-4 pb-2">
         <Logo />
+        <ThemeToggle />
       </div>
       <div className="px-3 pb-2">
         <p className="px-1.5 text-[10px] font-semibold tracking-[0.2em] text-stone-400 uppercase dark:text-muted-foreground">
@@ -273,10 +276,12 @@ export function DashboardShell({ children }: { children: React.ReactNode }) {
           <span className="text-stone-900 dark:text-white">wed</span>
           <span className="text-[#B76E79] italic">Plan</span>
         </span>
+        <ThemeToggle className="ml-auto size-9" />
       </header>
 
       {/* Main content area */}
       <main className="px-4 py-6 sm:px-6 lg:py-8 lg:pr-8 lg:pl-[19.5rem]">
+        <BackButton fallbackHref={`/${role}`} className="mb-5" />
         {children}
       </main>
     </div>

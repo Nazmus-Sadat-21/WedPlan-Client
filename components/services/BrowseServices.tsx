@@ -129,14 +129,14 @@ export function BrowseServices({ initialCategory }: { initialCategory?: string }
   }
 
   return (
-    <section className="relative overflow-hidden bg-[#FDFBF7] py-12 sm:py-16">
+    <section className="relative overflow-hidden bg-[#FDFBF7] dark:bg-background py-12 sm:py-16">
       <div
         aria-hidden="true"
-        className="pointer-events-none absolute -top-20 right-1/4 -z-10 h-80 w-80 rounded-full bg-rose-100/30 blur-3xl"
+        className="pointer-events-none absolute -top-20 right-1/4 -z-10 h-80 w-80 rounded-full bg-rose-100/30 dark:bg-rose-400/10 blur-3xl"
       />
       <div
         aria-hidden="true"
-        className="pointer-events-none absolute bottom-10 left-10 -z-10 h-72 w-72 rounded-full bg-amber-100/20 blur-3xl"
+        className="pointer-events-none absolute bottom-10 left-10 -z-10 h-72 w-72 rounded-full bg-amber-100/20 dark:bg-amber-300/5 blur-3xl"
       />
 
       <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
@@ -146,16 +146,16 @@ export function BrowseServices({ initialCategory }: { initialCategory?: string }
           description="Discover venues, photographers, florists, caterers and more — all reviewed and ready for your big day."
         />
 
-        <div className="mt-8 rounded-2xl border border-rose-200/75 bg-white p-4 shadow-xs sm:p-5">
+        <div className="mt-8 rounded-2xl border border-rose-200/75 dark:border-border bg-white dark:bg-card p-4 shadow-xs sm:p-5">
           <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
             <div className="relative sm:col-span-2 lg:col-span-1">
-              <SearchIcon className="pointer-events-none absolute top-1/2 left-3 size-4 -translate-y-1/2 text-stone-400" />
+              <SearchIcon className="pointer-events-none absolute top-1/2 left-3 size-4 -translate-y-1/2 text-stone-400 dark:text-muted-foreground/80" />
               <Input
                 type="search"
                 placeholder="Search by name, category or location"
                 value={search}
                 onChange={(event) => setSearch(event.target.value)}
-                className="h-10 border-rose-200/90 bg-white pl-9 focus-visible:border-[#B76E79] focus-visible:ring-[#B76E79]/25"
+                className="h-10 border-rose-200/90 dark:border-border bg-white dark:bg-card pl-9 focus-visible:border-[#B76E79] focus-visible:ring-[#B76E79]/25"
               />
             </div>
 
@@ -215,7 +215,7 @@ export function BrowseServices({ initialCategory }: { initialCategory?: string }
                 <Button
                   onClick={retry}
                   variant="outline"
-                  className="gap-2 rounded-full border-rose-200 hover:bg-rose-50"
+                  className="gap-2 rounded-full border-rose-200 dark:border-border hover:bg-rose-50 dark:hover:bg-input/40"
                 >
                   <RotateCcw className="size-4" />
                   Try again
@@ -237,7 +237,7 @@ export function BrowseServices({ initialCategory }: { initialCategory?: string }
                 <Button
                   onClick={clearFilters}
                   variant="outline"
-                  className="rounded-full border-rose-200 hover:bg-rose-50"
+                  className="rounded-full border-rose-200 dark:border-border hover:bg-rose-50 dark:hover:bg-input/40"
                 >
                   Clear filters
                 </Button>
@@ -245,8 +245,8 @@ export function BrowseServices({ initialCategory }: { initialCategory?: string }
             />
           ) : (
             <>
-              <p className="mb-4 text-sm text-stone-500">
-                Showing <span className="font-semibold text-stone-700">{filtered.length}</span>{" "}
+              <p className="mb-4 text-sm text-stone-500 dark:text-muted-foreground">
+                Showing <span className="font-semibold text-stone-700 dark:text-foreground/80">{filtered.length}</span>{" "}
                 of {state.services.length} services
               </p>
               <motion.div

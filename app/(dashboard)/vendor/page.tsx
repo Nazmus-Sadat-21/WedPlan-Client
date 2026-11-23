@@ -3,18 +3,20 @@
 import { useEffect, useMemo, useState } from "react"
 import { motion } from "motion/react"
 import {
+  AlertCircle,
   CalendarCheck,
   CalendarHeart,
   Crown,
   HandCoins,
   NotebookTabs,
-  Sparkles,
+  RotateCcw,
   Store,
 } from "lucide-react"
 
 import { OverviewHeader } from "@/components/dashboard/OverviewHeader"
 import { PageSkeleton } from "@/components/dashboard/PageSkeleton"
 import { StatCard } from "@/components/dashboard/StatCard"
+import { Button } from "@/components/ui/button"
 import { Skeleton } from "@/components/ui/skeleton"
 import { useSession } from "@/lib/auth-client"
 import { authFetch } from "@/lib/auth-fetch"
@@ -24,12 +26,9 @@ import {
   CategoryBars,
   ChartCard,
   EmptyChart,
-  MONTHS_BACK,
   StatusDonut,
   TrendChart,
-  lastMonths,
   summarizeBookings,
-  type BookingSummary,
 } from "@/components/dashboard/overview-charts"
 import type { Booking, Service } from "@/lib/types"
 import { cn } from "@/lib/utils"
@@ -39,16 +38,11 @@ import { cn } from "@/lib/utils"
 /* -------------------------------------------------------------------------- */
 
 /**
- * Vendor bookings endpoint. Adjust this path to match your Express route.
- * If the request fails, the charts fall back to clearly labelled sample data
- * so the dashboard still renders.
+ * Vendor bookings endpoint. Kept in sync with `API_ENDPOINTS.vendorBookings`
+ * so the dashboard and the booking-requests page always read the same data.
  */
-const SERVER_BASE = (process.env.NEXT_PUBLIC_SERVER_API ?? "").replace(
-  /\/+$/,
-  ""
-)
 const vendorBookingsEndpoint = (vendorId: string) =>
-  `${SERVER_BASE}/bookings/vendor/${encodeURIComponent(vendorId)}`
+  API_ENDPOINTS.vendorBookings(vendorId)
 
 /* -------------------------------------------------------------------------- */
 /*  Data helpers                                                              */
@@ -68,21 +62,6 @@ function approvalOf(service: Service): "approved" | "pending" | "rejected" {
   if (raw === "approved") return "approved"
   if (raw === "rejected") return "rejected"
   return "pending"
-}
-
-function sampleBookingSummary(): BookingSummary {
-  const months = lastMonths(MONTHS_BACK)
-  const requests = [3, 5, 4, 8, 7, 11]
-  const accepted = [1, 3, 2, 5, 4, 7]
-  return {
-    monthly: months.map((month, index) => ({
-      label: month.label,
-      requests: requests[index],
-      accepted: accepted[index],
-    })),
-    status: { accepted: 22, pending: 5, rejected: 7, cancelled: 4 },
-    total: 38,
-  }
 }
 
 function summarizeServices(services: Service[]): ServiceSummary {
@@ -180,8 +159,10 @@ export default function VendorOverviewPage() {
 
   const [services, setServices] = useState<Service[] | null>(null)
   const [bookings, setBookings] = useState<Booking[] | null>(null)
+  const [servicesUnavailable, setServicesUnavailable] = useState(false)
   const [bookingsUnavailable, setBookingsUnavailable] = useState(false)
   const [loading, setLoading] = useState(true)
+  const [reloadKey, setReloadKey] = useState(0)
 
   useEffect(() => {
     if (!userId) return
@@ -216,8 +197,10 @@ export default function VendorOverviewPage() {
 
       if (servicesResult.status === "fulfilled") {
         setServices(servicesResult.value)
+        setServicesUnavailable(false)
       } else {
         setServices([])
+        setServicesUnavailable(true)
       }
 
       if (bookingsResult.status === "fulfilled") {
@@ -237,25 +220,33 @@ export default function VendorOverviewPage() {
       active = false
       controller.abort()
     }
-  }, [userId])
+  }, [userId, reloadKey])
 
   const serviceSummary = useMemo(
     () => summarizeServices(services ?? []),
     [services]
   )
   const bookingSummary = useMemo(
-    () => (bookings ? summarizeBookings(bookings) : sampleBookingSummary()),
+    () => (bookings ? summarizeBookings(bookings) : null),
     [bookings]
   )
 
   if (isPending) return <PageSkeleton />
 
-  const showSample = !loading && bookingsUnavailable
   const dash = "—"
+  const bookingTotal = bookingSummary?.total ?? 0
+  const bookingStatus = bookingSummary?.status ?? {
+    accepted: 0,
+    pending: 0,
+    rejected: 0,
+    cancelled: 0,
+  }
+  const dataUnavailable =
+    !loading && (servicesUnavailable || bookingsUnavailable)
 
   const acceptanceRate =
-    bookingSummary.total > 0
-      ? Math.round((bookingSummary.status.accepted / bookingSummary.total) * 100)
+    bookingTotal > 0
+      ? Math.round((bookingStatus.accepted / bookingTotal) * 100)
       : 0
 
   return (
@@ -276,23 +267,42 @@ export default function VendorOverviewPage() {
         />
         <StatCard
           label="Pending Requests"
-          value={loading ? dash : bookingSummary.status.pending}
+          value={loading ? dash : bookingStatus.pending}
           icon={CalendarHeart}
         />
         <StatCard
           label="Accepted Bookings"
-          value={loading ? dash : bookingSummary.status.accepted}
+          value={loading ? dash : bookingStatus.accepted}
           icon={CalendarCheck}
         />
         <StatCard label="Current Plan" value={planLabel} icon={HandCoins} />
       </div>
 
-      {showSample ? (
-        <p className="mt-4 inline-flex items-center gap-2 rounded-full border border-amber-200 bg-amber-50 px-3.5 py-1.5 text-xs font-medium text-amber-800 dark:border-amber-500/30 dark:bg-amber-500/10 dark:text-amber-300">
-          <Sparkles className="size-3.5" />
-          Booking charts show sample data until the vendor bookings endpoint
-          responds.
-        </p>
+      {dataUnavailable ? (
+        <div
+          role="alert"
+          className="mt-4 flex flex-wrap items-center gap-3 rounded-2xl border border-rose-200 bg-rose-50/80 px-4 py-3 text-sm text-rose-900 dark:border-rose-500/30 dark:bg-rose-500/10 dark:text-rose-200"
+        >
+          <AlertCircle className="size-4 shrink-0" aria-hidden="true" />
+          <p className="min-w-0 flex-1">
+            {servicesUnavailable && bookingsUnavailable
+              ? "We couldn't load your services or bookings."
+              : servicesUnavailable
+                ? "We couldn't load your services."
+                : "We couldn't load your booking activity."}{" "}
+            The numbers below may be incomplete.
+          </p>
+          <Button
+            type="button"
+            size="sm"
+            variant="outline"
+            onClick={() => setReloadKey((key) => key + 1)}
+            className="rounded-full"
+          >
+            <RotateCcw className="size-4" aria-hidden="true" />
+            Try again
+          </Button>
+        </div>
       ) : null}
 
       {/* Charts */}
@@ -324,10 +334,16 @@ export default function VendorOverviewPage() {
               </div>
             }
           >
-            {bookingSummary.total === 0 ? (
-              <EmptyChart message="No booking requests yet. Activity will appear here once couples start requesting your services." />
+            {bookingTotal === 0 ? (
+              <EmptyChart
+                message={
+                  bookingsUnavailable
+                    ? "Booking activity is unavailable right now. Use “Try again” above to reload it."
+                    : "No booking requests yet. Activity will appear here once couples start requesting your services."
+                }
+              />
             ) : (
-              <TrendChart data={bookingSummary.monthly} />
+              <TrendChart data={bookingSummary!.monthly} />
             )}
           </ChartCard>
 
@@ -339,8 +355,8 @@ export default function VendorOverviewPage() {
             delay={0.1}
           >
             <StatusDonut
-              status={bookingSummary.status}
-              total={bookingSummary.total}
+              status={bookingStatus}
+              total={bookingTotal}
             />
           </ChartCard>
 
@@ -391,7 +407,7 @@ export default function VendorOverviewPage() {
                     {planLabel}
                   </p>
                   <p className="mt-1 text-xs text-rose-100/80">
-                    {bookingSummary.total > 0
+                    {bookingTotal > 0
                       ? `${acceptanceRate}% of your requests were accepted.`
                       : "Your acceptance rate will show here."}
                   </p>
