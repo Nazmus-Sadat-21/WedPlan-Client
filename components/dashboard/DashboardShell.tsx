@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react"
 import Link from "next/link"
 import { usePathname, useRouter } from "next/navigation"
+import { motion, useReducedMotion } from "motion/react"
 import { Heart, LogOut, Menu, ShieldX } from "lucide-react"
 import { toast } from "sonner"
 
@@ -22,6 +23,7 @@ import { DASHBOARD_NAV, type NavItem } from "@/components/dashboard/nav"
 import { DashboardLoader } from "@/components/dashboard/RoleGate"
 import { signOut, useSession } from "@/lib/auth-client"
 import { getUserInitials } from "@/lib/format"
+import { EASE_OUT } from "@/lib/motion"
 import { cn } from "@/lib/utils"
 
 function isActive(pathname: string, item: NavItem, baseUrl: string) {
@@ -41,34 +43,48 @@ function SidebarNav({
 }) {
   const pathname = usePathname()
   const items = DASHBOARD_NAV[role] ?? DASHBOARD_NAV.customer
+  const reduceMotion = useReducedMotion()
 
   return (
     <nav className={cn("flex flex-col gap-1.5", className)}>
-      {items.map((item) => {
+      {items.map((item, index) => {
         const active = isActive(pathname, item, `/${role}`)
         return (
-          <Link
+          <motion.div
             key={item.href}
-            href={item.href}
-            onClick={onNavigate}
-            aria-current={active ? "page" : undefined}
-            className={cn(
-              "flex items-center gap-3 rounded-xl px-3.5 py-2.5 text-sm font-medium transition-all outline-none focus-visible:ring-2 focus-visible:ring-[#B76E79]/50",
-              active
-                ? "bg-rose-100/80 text-[#9F5863] shadow-2xs"
-                : "text-stone-600 hover:bg-rose-50/80 hover:text-stone-900 dark:text-muted-foreground dark:hover:bg-input/30 dark:hover:text-foreground"
-            )}
+            initial={reduceMotion ? false : { opacity: 0, x: -12 }}
+            animate={reduceMotion ? undefined : { opacity: 1, x: 0 }}
+            transition={{ delay: index * 0.04, duration: 0.35, ease: EASE_OUT }}
           >
-            <item.icon
+            <Link
+              href={item.href}
+              onClick={onNavigate}
+              aria-current={active ? "page" : undefined}
               className={cn(
-                "size-4.5 shrink-0",
+                "relative flex items-center gap-3 rounded-xl px-3.5 py-2.5 text-sm font-medium transition-all outline-none focus-visible:ring-2 focus-visible:ring-[#B76E79]/50",
                 active
-                  ? "text-[#B76E79]"
-                  : "text-stone-400 dark:text-muted-foreground"
+                  ? "text-[#9F5863]"
+                  : "text-stone-600 hover:bg-rose-50/80 hover:text-stone-900 dark:text-muted-foreground dark:hover:bg-input/30 dark:hover:text-foreground"
               )}
-            />
-            {item.label}
-          </Link>
+            >
+              {active ? (
+                <motion.span
+                  layoutId="dashboard-nav-active"
+                  transition={{ type: "spring", stiffness: 380, damping: 32 }}
+                  className="absolute inset-0 rounded-xl bg-rose-100/80 shadow-2xs dark:bg-rose-400/10"
+                />
+              ) : null}
+              <item.icon
+                className={cn(
+                  "relative size-4.5 shrink-0",
+                  active
+                    ? "text-[#B76E79]"
+                    : "text-stone-400 dark:text-muted-foreground"
+                )}
+              />
+              <span className="relative">{item.label}</span>
+            </Link>
+          </motion.div>
         )
       })}
     </nav>
@@ -282,7 +298,13 @@ export function DashboardShell({ children }: { children: React.ReactNode }) {
       {/* Main content area */}
       <main className="px-4 py-6 sm:px-6 lg:py-8 lg:pr-8 lg:pl-[19.5rem]">
         <BackButton fallbackHref={`/${role}`} className="mb-5" />
-        {children}
+        <motion.div
+          initial={{ opacity: 0, y: 12 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.45, ease: EASE_OUT }}
+        >
+          {children}
+        </motion.div>
       </main>
     </div>
   )

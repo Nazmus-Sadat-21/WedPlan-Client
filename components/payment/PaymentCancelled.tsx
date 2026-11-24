@@ -1,6 +1,7 @@
 "use client"
 
 import Link from "next/link"
+import { motion, useReducedMotion } from "motion/react"
 import {
   ArrowLeft,
   ArrowRight,
@@ -14,6 +15,7 @@ import {
 } from "lucide-react"
 
 import { Button } from "@/components/ui/button"
+import { EASE_OUT, fadeUp, springSoft, staggerContainer } from "@/lib/motion"
 
 const PREMIUM_PERKS = [
   "Unlimited active services",
@@ -23,13 +25,27 @@ const PREMIUM_PERKS = [
 ]
 
 export function PaymentCancelled() {
+  const reduceMotion = useReducedMotion()
+
   return (
     <div className="relative overflow-hidden bg-[#FDFBF7] px-4 py-10 sm:px-6 sm:py-16 dark:bg-background">
-      <div
+      <motion.div
         aria-hidden="true"
+        animate={
+          reduceMotion
+            ? undefined
+            : { opacity: [0.4, 0.75, 0.4], scale: [1, 1.1, 1] }
+        }
+        transition={{ duration: 9, repeat: Infinity, ease: "easeInOut" }}
         className="pointer-events-none absolute -top-24 left-1/2 size-72 -translate-x-1/2 rounded-full bg-rose-200/40 blur-3xl dark:bg-rose-500/10"
       />
-      <div className="relative mx-auto w-full max-w-2xl">
+
+      <motion.div
+        initial={reduceMotion ? false : { opacity: 0, y: 24, scale: 0.985 }}
+        animate={reduceMotion ? undefined : { opacity: 1, y: 0, scale: 1 }}
+        transition={{ duration: 0.6, ease: EASE_OUT }}
+        className="relative mx-auto w-full max-w-2xl"
+      >
         <div className="overflow-hidden rounded-3xl border border-rose-200/80 bg-white shadow-xl shadow-rose-950/5 dark:border-input dark:bg-card">
           <div className="relative overflow-hidden bg-gradient-to-br from-[#2c1a1f] via-[#4a2b32] to-[#9F5863] px-6 py-9 text-center text-white sm:px-8">
             <div
@@ -41,25 +57,53 @@ export function PaymentCancelled() {
               className="pointer-events-none absolute -bottom-16 -left-10 size-44 rounded-full bg-amber-200/15 blur-3xl"
             />
 
-            <div className="relative mx-auto flex size-16 items-center justify-center rounded-full border border-white/25 bg-white/15 backdrop-blur-md">
+            <motion.div
+              initial={reduceMotion ? false : { scale: 0.6, rotate: -12, opacity: 0 }}
+              animate={reduceMotion ? undefined : { scale: 1, rotate: 0, opacity: 1 }}
+              transition={{ delay: 0.1, duration: 0.55, ease: EASE_OUT }}
+              className="relative mx-auto flex size-16 items-center justify-center rounded-full border border-white/25 bg-white/15 backdrop-blur-md"
+            >
               <XCircle className="size-8" />
-            </div>
+            </motion.div>
 
-            <p className="relative mt-4 flex items-center justify-center gap-2 text-[10px] font-semibold tracking-[0.24em] text-rose-200/90 uppercase">
+            <motion.p
+              initial={reduceMotion ? false : { opacity: 0, y: 10 }}
+              animate={reduceMotion ? undefined : { opacity: 1, y: 0 }}
+              transition={{ delay: 0.2, duration: 0.5, ease: EASE_OUT }}
+              className="relative mt-4 flex items-center justify-center gap-2 text-[10px] font-semibold tracking-[0.24em] text-rose-200/90 uppercase"
+            >
               <Crown className="size-3" />
               Checkout cancelled
-            </p>
-            <h1 className="relative mt-1.5 font-heading text-3xl font-semibold tracking-tight sm:text-4xl">
+            </motion.p>
+            <motion.h1
+              initial={reduceMotion ? false : { opacity: 0, y: 12 }}
+              animate={reduceMotion ? undefined : { opacity: 1, y: 0 }}
+              transition={{ delay: 0.26, duration: 0.55, ease: EASE_OUT }}
+              className="relative mt-1.5 font-heading text-3xl font-semibold tracking-tight sm:text-4xl"
+            >
               No payment was taken
-            </h1>
-            <p className="relative mx-auto mt-2 max-w-md text-sm leading-relaxed text-rose-100/80">
+            </motion.h1>
+            <motion.p
+              initial={reduceMotion ? false : { opacity: 0, y: 12 }}
+              animate={reduceMotion ? undefined : { opacity: 1, y: 0 }}
+              transition={{ delay: 0.32, duration: 0.55, ease: EASE_OUT }}
+              className="relative mx-auto mt-2 max-w-md text-sm leading-relaxed text-rose-100/80"
+            >
               You left Stripe checkout before completing the payment. Your Free
               plan is still active and nothing has been charged.
-            </p>
+            </motion.p>
           </div>
 
-          <div className="space-y-5 p-6 sm:p-8">
-            <div className="flex items-center gap-3 rounded-2xl border border-rose-200/75 bg-rose-50/60 p-4 dark:border-input dark:bg-input/20">
+          <motion.div
+            variants={reduceMotion ? undefined : staggerContainer(0.08, 0.15)}
+            initial={reduceMotion ? false : "hidden"}
+            animate={reduceMotion ? undefined : "show"}
+            className="space-y-5 p-6 sm:p-8"
+          >
+            <motion.div
+              variants={reduceMotion ? undefined : fadeUp}
+              className="flex items-center gap-3 rounded-2xl border border-rose-200/75 bg-rose-50/60 p-4 dark:border-input dark:bg-input/20"
+            >
               <span className="flex size-11 shrink-0 items-center justify-center rounded-xl bg-white text-[#B76E79] shadow-2xs dark:bg-input/40 dark:text-champagne-400">
                 <Store className="size-5" />
               </span>
@@ -72,47 +116,75 @@ export function PaymentCancelled() {
                   booking request.
                 </p>
               </div>
-            </div>
+            </motion.div>
 
-            <div className="rounded-2xl border border-rose-200/75 bg-white p-4 dark:border-input dark:bg-input/20">
+            <motion.div
+              variants={reduceMotion ? undefined : fadeUp}
+              className="rounded-2xl border border-rose-200/75 bg-white p-4 dark:border-input dark:bg-input/20"
+            >
               <p className="flex items-center gap-1.5 text-[10px] font-semibold tracking-[0.16em] text-stone-400 uppercase dark:text-muted-foreground">
                 <Gem className="size-3.5 text-[#B76E79]" />
                 Waiting when you are ready
               </p>
               <ul className="mt-3 grid gap-2 sm:grid-cols-2">
-                {PREMIUM_PERKS.map((perk) => (
-                  <li
+                {PREMIUM_PERKS.map((perk, index) => (
+                  <motion.li
                     key={perk}
+                    initial={reduceMotion ? false : { opacity: 0, x: -8 }}
+                    animate={reduceMotion ? undefined : { opacity: 1, x: 0 }}
+                    transition={{
+                      delay: 0.35 + index * 0.06,
+                      duration: 0.4,
+                      ease: EASE_OUT,
+                    }}
                     className="flex items-center gap-2 text-xs font-medium text-stone-700 dark:text-muted-foreground"
                   >
                     <span className="flex size-4.5 shrink-0 items-center justify-center rounded-full bg-rose-50 text-[#B76E79] dark:bg-input/40 dark:text-champagne-400">
                       <Check className="size-2.5" strokeWidth={3} />
                     </span>
                     {perk}
-                  </li>
+                  </motion.li>
                 ))}
               </ul>
-            </div>
+            </motion.div>
 
-            <div className="flex flex-wrap gap-2">
-              <Button
-                render={<Link href="/vendor/subscription" />}
-                className="gap-2 rounded-full bg-[#B76E79] text-white hover:bg-[#a25c67]"
+            <motion.div
+              variants={reduceMotion ? undefined : fadeUp}
+              className="flex flex-wrap gap-2"
+            >
+              <motion.div
+                whileHover={reduceMotion ? undefined : { y: -2 }}
+                whileTap={reduceMotion ? undefined : { scale: 0.98 }}
+                transition={springSoft}
               >
-                Back to plans
-                <ArrowRight className="size-4" />
-              </Button>
-              <Button
-                render={<Link href="/vendor" />}
-                variant="outline"
-                className="gap-2 rounded-full border-rose-200 hover:bg-rose-50 dark:border-input dark:hover:bg-input/50"
+                <Button
+                  render={<Link href="/vendor/subscription" />}
+                  className="gap-2 rounded-full bg-[#B76E79] text-white hover:bg-[#a25c67]"
+                >
+                  Back to plans
+                  <ArrowRight className="size-4" />
+                </Button>
+              </motion.div>
+              <motion.div
+                whileHover={reduceMotion ? undefined : { y: -2 }}
+                whileTap={reduceMotion ? undefined : { scale: 0.98 }}
+                transition={springSoft}
               >
-                <ArrowLeft className="size-4" />
-                Vendor dashboard
-              </Button>
-            </div>
+                <Button
+                  render={<Link href="/vendor" />}
+                  variant="outline"
+                  className="gap-2 rounded-full border-rose-200 hover:bg-rose-50 dark:border-input dark:hover:bg-input/50"
+                >
+                  <ArrowLeft className="size-4" />
+                  Vendor dashboard
+                </Button>
+              </motion.div>
+            </motion.div>
 
-            <div className="flex flex-wrap items-center justify-center gap-x-5 gap-y-2 border-t border-rose-100 pt-4 text-[11px] text-stone-400 dark:border-input dark:text-muted-foreground">
+            <motion.div
+              variants={reduceMotion ? undefined : fadeUp}
+              className="flex flex-wrap items-center justify-center gap-x-5 gap-y-2 border-t border-rose-100 pt-4 text-[11px] text-stone-400 dark:border-input dark:text-muted-foreground"
+            >
               <span className="inline-flex items-center gap-1.5">
                 <ShieldCheck className="size-3" />
                 No charge was made
@@ -121,10 +193,10 @@ export function PaymentCancelled() {
                 <CalendarHeart className="size-3" />
                 Upgrade anytime
               </span>
-            </div>
-          </div>
+            </motion.div>
+          </motion.div>
         </div>
-      </div>
+      </motion.div>
     </div>
   )
 }

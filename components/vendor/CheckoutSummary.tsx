@@ -2,6 +2,7 @@
 
 import { useState } from "react"
 import Link from "next/link"
+import { motion, useReducedMotion } from "motion/react"
 import {
   ArrowLeft,
   ArrowRight,
@@ -26,6 +27,7 @@ import { Skeleton } from "@/components/ui/skeleton"
 import { useSession } from "@/lib/auth-client"
 import { authFetch } from "@/lib/auth-fetch"
 import { API_ENDPOINTS } from "@/lib/constants"
+import { EASE_OUT } from "@/lib/motion"
 import { cn } from "@/lib/utils"
 
 const PREMIUM_PRICE = 29
@@ -60,6 +62,7 @@ export function CheckoutSummary() {
   const user = data?.user
   const userId = user?.id
   const premium = isPremiumPlan(user?.subscriptionPlan)
+  const reduceMotion = useReducedMotion()
 
   const [redirecting, setRedirecting] = useState(false)
   const [error, setError] = useState<string | null>(null)
@@ -120,9 +123,19 @@ export function CheckoutSummary() {
   }
 
   return (
-    <div className="mx-auto w-full max-w-6xl space-y-6">
+    <motion.div
+      initial={reduceMotion ? false : { opacity: 0, y: 16 }}
+      animate={reduceMotion ? undefined : { opacity: 1, y: 0 }}
+      transition={{ duration: 0.5, ease: EASE_OUT }}
+      className="mx-auto w-full max-w-6xl space-y-6"
+    >
       {/* Header */}
-      <header className="relative overflow-hidden rounded-3xl border border-rose-200/70 bg-gradient-to-br from-[#2c1a1f] via-[#4a2b32] to-[#9F5863] px-6 py-7 text-white shadow-xl shadow-rose-950/15 sm:px-8 sm:py-8">
+      <motion.header
+        initial={reduceMotion ? false : { opacity: 0, y: 18, scale: 0.99 }}
+        animate={reduceMotion ? undefined : { opacity: 1, y: 0, scale: 1 }}
+        transition={{ duration: 0.55, ease: EASE_OUT }}
+        className="relative overflow-hidden rounded-3xl border border-rose-200/70 bg-gradient-to-br from-[#2c1a1f] via-[#4a2b32] to-[#9F5863] px-6 py-7 text-white shadow-xl shadow-rose-950/15 sm:px-8 sm:py-8"
+      >
         <div
           aria-hidden="true"
           className="pointer-events-none absolute -top-20 -right-10 size-56 rounded-full bg-rose-300/20 blur-3xl"
@@ -149,13 +162,20 @@ export function CheckoutSummary() {
             Back to plans
           </Link>
         </div>
-      </header>
+      </motion.header>
 
       {/* Steps */}
       <ol className="grid gap-3 sm:grid-cols-3">
         {STEPS.map((item, index) => (
-          <li
+          <motion.li
             key={item.step}
+            initial={reduceMotion ? false : { opacity: 0, y: 12 }}
+            animate={reduceMotion ? undefined : { opacity: 1, y: 0 }}
+            transition={{
+              delay: 0.15 + index * 0.08,
+              duration: 0.45,
+              ease: EASE_OUT,
+            }}
             className={cn(
               "flex items-center gap-3 rounded-2xl border px-4 py-3",
               index === 0
@@ -181,12 +201,17 @@ export function CheckoutSummary() {
                 {item.description}
               </p>
             </div>
-          </li>
+          </motion.li>
         ))}
       </ol>
 
       {premium ? (
-        <div className="flex flex-col items-center rounded-3xl border border-amber-200/80 bg-gradient-to-br from-amber-50 via-white to-rose-50/50 px-6 py-14 text-center shadow-2xs dark:border-amber-500/20 dark:from-amber-500/10 dark:via-card dark:to-card">
+        <motion.div
+          initial={reduceMotion ? false : { opacity: 0, y: 18 }}
+          animate={reduceMotion ? undefined : { opacity: 1, y: 0 }}
+          transition={{ duration: 0.5, ease: EASE_OUT }}
+          className="flex flex-col items-center rounded-3xl border border-amber-200/80 bg-gradient-to-br from-amber-50 via-white to-rose-50/50 px-6 py-14 text-center shadow-2xs dark:border-amber-500/20 dark:from-amber-500/10 dark:via-card dark:to-card"
+        >
           <span className="flex size-14 items-center justify-center rounded-2xl bg-gradient-to-br from-[#E9C99B] to-[#C58970] text-[#3a2328] shadow-md">
             <Crown className="size-6" />
           </span>
@@ -213,12 +238,17 @@ export function CheckoutSummary() {
               <ArrowRight className="size-4" />
             </Button>
           </div>
-        </div>
+        </motion.div>
       ) : (
         <div className="grid items-start gap-5 lg:grid-cols-[1.45fr_1fr]">
           {/* Plan details */}
           <div className="space-y-5">
-            <section className="relative overflow-hidden rounded-3xl border border-[#E9C99B]/40 bg-gradient-to-br from-[#2c1a1f] via-[#4a2b32] to-[#9F5863] p-6 text-white shadow-lg shadow-rose-950/15 sm:p-7">
+            <motion.section
+              initial={reduceMotion ? false : { opacity: 0, y: 18 }}
+              animate={reduceMotion ? undefined : { opacity: 1, y: 0 }}
+              transition={{ delay: 0.1, duration: 0.5, ease: EASE_OUT }}
+              className="relative overflow-hidden rounded-3xl border border-[#E9C99B]/40 bg-gradient-to-br from-[#2c1a1f] via-[#4a2b32] to-[#9F5863] p-6 text-white shadow-lg shadow-rose-950/15 sm:p-7"
+            >
               <div
                 aria-hidden="true"
                 className="pointer-events-none absolute -top-16 -right-10 size-48 rounded-full bg-[#E9C99B]/20 blur-3xl"
@@ -261,9 +291,14 @@ export function CheckoutSummary() {
                   </li>
                 ))}
               </ul>
-            </section>
+            </motion.section>
 
-            <section className="rounded-3xl border border-rose-200/80 bg-white/90 p-5 shadow-2xs sm:p-6 dark:border-input dark:bg-card/90">
+            <motion.section
+              initial={reduceMotion ? false : { opacity: 0, y: 18 }}
+              animate={reduceMotion ? undefined : { opacity: 1, y: 0 }}
+              transition={{ delay: 0.18, duration: 0.5, ease: EASE_OUT }}
+              className="rounded-3xl border border-rose-200/80 bg-white/90 p-5 shadow-2xs sm:p-6 dark:border-input dark:bg-card/90"
+            >
               <h3 className="flex items-center gap-2 font-heading text-lg font-semibold text-stone-900 dark:text-foreground">
                 <ShieldCheck className="size-4.5 text-[#B76E79]" />
                 What happens after payment
@@ -304,7 +339,7 @@ export function CheckoutSummary() {
                   </div>
                 ))}
               </div>
-            </section>
+            </motion.section>
           </div>
 
           {/* Order summary */}
@@ -431,6 +466,6 @@ export function CheckoutSummary() {
           Keep all Free features
         </span>
       </div>
-    </div>
+    </motion.div>
   )
 }

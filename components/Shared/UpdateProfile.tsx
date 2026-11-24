@@ -1,6 +1,7 @@
 "use client"
 
 import { useEffect, useRef, useState } from "react"
+import { motion, useReducedMotion } from "motion/react"
 import {
   BadgeCheck,
   Briefcase,
@@ -31,6 +32,7 @@ import { useSession } from "@/lib/auth-client"
 import { authFetch } from "@/lib/auth-fetch"
 import { formatDate } from "@/lib/format"
 import { uploadToImgbb } from "@/lib/imgbb"
+import { EASE_OUT } from "@/lib/motion"
 import { cn } from "@/lib/utils"
 
 const MAX_IMAGE_BYTES = 5 * 1024 * 1024
@@ -95,6 +97,7 @@ function getInitials(name?: string | null): string {
 export function UpdateProfile({ data, onUpdated }: UpdateProfileProps) {
   const { data: sessionData, isPending: sessionLoading, refetch } = useSession()
   const profile = extractUser(data, sessionData)
+  const reduceMotion = useReducedMotion()
 
   const [name, setName] = useState("")
   const [businessName, setBusinessName] = useState("")
@@ -367,9 +370,19 @@ export function UpdateProfile({ data, onUpdated }: UpdateProfileProps) {
   }
 
   return (
-    <div className="mx-auto max-w-6xl space-y-5 sm:space-y-6">
+    <motion.div
+      initial={reduceMotion ? false : { opacity: 0, y: 16 }}
+      animate={reduceMotion ? undefined : { opacity: 1, y: 0 }}
+      transition={{ duration: 0.5, ease: EASE_OUT }}
+      className="mx-auto max-w-6xl space-y-5 sm:space-y-6"
+    >
       {/* HERO: cover + overlapping identity */}
-      <section className="overflow-hidden rounded-3xl border border-rose-200/80 bg-white/95 shadow-xs dark:border-input dark:bg-card/90">
+      <motion.section
+        initial={reduceMotion ? false : { opacity: 0, y: 18, scale: 0.99 }}
+        animate={reduceMotion ? undefined : { opacity: 1, y: 0, scale: 1 }}
+        transition={{ duration: 0.55, ease: EASE_OUT }}
+        className="overflow-hidden rounded-3xl border border-rose-200/80 bg-white/95 shadow-xs dark:border-input dark:bg-card/90"
+      >
         {/* Gradient cover */}
         <div className="relative h-36 overflow-hidden bg-gradient-to-r from-[#fff8f6] via-[#fceced] to-[#f4d8dc] px-4 pt-4 dark:from-card/90 dark:via-card dark:to-input/30 sm:h-44 sm:px-8 sm:pt-5">
           <div
@@ -525,13 +538,21 @@ export function UpdateProfile({ data, onUpdated }: UpdateProfileProps) {
             </div>
           </div>
         </div>
-      </section>
+      </motion.section>
 
       {/* SUMMARY STRIP */}
       <div className="grid grid-cols-2 gap-3 sm:gap-4 lg:grid-cols-4">
-        {summaryTiles.map((tile) => (
-          <div
+        {summaryTiles.map((tile, index) => (
+          <motion.div
             key={tile.label}
+            initial={reduceMotion ? false : { opacity: 0, y: 14 }}
+            animate={reduceMotion ? undefined : { opacity: 1, y: 0 }}
+            transition={{
+              delay: 0.12 + index * 0.06,
+              duration: 0.45,
+              ease: EASE_OUT,
+            }}
+            whileHover={reduceMotion ? undefined : { y: -3 }}
             className="flex items-center gap-3 rounded-2xl border border-rose-200/75 bg-white/95 p-3.5 shadow-2xs transition-shadow hover:shadow-md hover:shadow-rose-950/5 sm:p-4 dark:border-input dark:bg-card/90"
           >
             <span className="flex size-10 shrink-0 items-center justify-center rounded-xl bg-rose-50 text-[#B76E79] ring-1 ring-rose-100 dark:bg-input/40 dark:text-champagne-400 dark:ring-input">
@@ -550,17 +571,20 @@ export function UpdateProfile({ data, onUpdated }: UpdateProfileProps) {
                 {tile.value}
               </p>
             </div>
-          </div>
+          </motion.div>
         ))}
       </div>
 
       {/* WORKSPACE: form + sidebar */}
       <div className="grid gap-5 sm:gap-6 lg:grid-cols-12 lg:items-start">
         {/* Editable form */}
-        <form
+        <motion.form
           onSubmit={handleSubmit}
           noValidate
           aria-busy={submitting || sessionLoading}
+          initial={reduceMotion ? false : { opacity: 0, y: 18 }}
+          animate={reduceMotion ? undefined : { opacity: 1, y: 0 }}
+          transition={{ delay: 0.2, duration: 0.5, ease: EASE_OUT }}
           className="space-y-5 lg:col-span-8"
         >
           <input
@@ -741,10 +765,15 @@ export function UpdateProfile({ data, onUpdated }: UpdateProfileProps) {
               </Button>
             </div>
           </div>
-        </form>
+        </motion.form>
 
         {/* Sidebar */}
-        <aside className="space-y-5 lg:sticky lg:top-24 lg:col-span-4">
+        <motion.aside
+          initial={reduceMotion ? false : { opacity: 0, y: 18 }}
+          animate={reduceMotion ? undefined : { opacity: 1, y: 0 }}
+          transition={{ delay: 0.28, duration: 0.5, ease: EASE_OUT }}
+          className="space-y-5 lg:sticky lg:top-24 lg:col-span-4"
+        >
           {/* Account standing */}
           <div className="rounded-3xl border border-rose-200/80 bg-white/95 p-5 shadow-xs sm:p-6 dark:border-input dark:bg-card/90">
             <div className="flex items-center gap-2.5 border-b border-rose-100 pb-4 dark:border-input">
@@ -828,9 +857,9 @@ export function UpdateProfile({ data, onUpdated }: UpdateProfileProps) {
               self-service profile settings.
             </p>
           </div>
-        </aside>
+        </motion.aside>
       </div>
-    </div>
+    </motion.div>
   )
 }
 

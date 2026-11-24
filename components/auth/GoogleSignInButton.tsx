@@ -1,12 +1,14 @@
 "use client"
 
 import { useState } from "react"
+import { motion, useReducedMotion } from "motion/react"
 import { LoaderCircle } from "lucide-react"
 import { toast } from "sonner"
 
 import { Button } from "@/components/ui/button"
 import { authFocusRingClassName } from "@/components/auth/field-styles"
 import { authClient } from "@/lib/auth-client"
+import { springSoft } from "@/lib/motion"
 import {
   clearPendingGoogleRole,
   rememberPendingGoogleRole,
@@ -47,6 +49,7 @@ export function GoogleSignInButton({
   label,
 }: GoogleSignInButtonProps) {
   const [loading, setLoading] = useState(false)
+  const reduceMotion = useReducedMotion()
 
   async function handleClick() {
     setLoading(true)
@@ -81,24 +84,30 @@ export function GoogleSignInButton({
   }
 
   return (
-    <Button
-      type="button"
-      variant="outline"
-      onClick={handleClick}
-      disabled={disabled || loading}
-      className={cn(
-        "h-10 w-full gap-2 border-rose-200/90 bg-white/70 hover:bg-rose-50/70 dark:border-input dark:bg-input/30 dark:hover:bg-input/50",
-        authFocusRingClassName
-      )}
+    <motion.div
+      whileHover={reduceMotion || disabled || loading ? undefined : { y: -2 }}
+      whileTap={reduceMotion || disabled || loading ? undefined : { scale: 0.99 }}
+      transition={springSoft}
     >
-      {loading ? (
-        <LoaderCircle className="size-4 animate-spin text-[#B76E79] dark:text-champagne-400" />
-      ) : (
-        <GoogleIcon className="size-4" />
-      )}
-      {loading
-        ? "Redirecting to Google…"
-        : (label ?? "Continue with Google")}
-    </Button>
+      <Button
+        type="button"
+        variant="outline"
+        onClick={handleClick}
+        disabled={disabled || loading}
+        className={cn(
+          "h-11 w-full gap-2.5 rounded-xl border-rose-200/90 bg-white/70 text-sm font-medium hover:border-[#B76E79]/40 hover:bg-rose-50/70 dark:border-input dark:bg-input/30 dark:hover:bg-input/50",
+          authFocusRingClassName
+        )}
+      >
+        {loading ? (
+          <LoaderCircle className="size-4 animate-spin text-[#B76E79] dark:text-champagne-400" />
+        ) : (
+          <GoogleIcon className="size-4" />
+        )}
+        {loading
+          ? "Redirecting to Google…"
+          : (label ?? "Continue with Google")}
+      </Button>
+    </motion.div>
   )
 }

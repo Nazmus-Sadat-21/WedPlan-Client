@@ -3,7 +3,8 @@
 import { useState } from "react"
 import Link from "next/link"
 import { useRouter } from "next/navigation"
-import { LoaderCircle, LogIn } from "lucide-react"
+import { motion, useReducedMotion } from "motion/react"
+import { ArrowRight, LoaderCircle, LogIn, ShieldCheck } from "lucide-react"
 import { toast } from "sonner"
 
 import { Button } from "@/components/ui/button"
@@ -13,11 +14,14 @@ import { authControlClassName } from "@/components/auth/field-styles"
 import { GoogleSignInButton } from "@/components/auth/GoogleSignInButton"
 import { PasswordField } from "@/components/auth/PasswordField"
 import { authClient } from "@/lib/auth-client"
+import { EASE_OUT, fadeUp, springSoft, staggerContainer } from "@/lib/motion"
 import { dashboardPathForRole } from "@/lib/roles"
 import { validateEmail, validateRequired } from "@/lib/validation"
+import { cn } from "@/lib/utils"
 
 export function SignInForm({ nextPath }: { nextPath?: string }) {
   const router = useRouter()
+  const reduceMotion = useReducedMotion()
   const [email, setEmail] = useState("")
   const [password, setPassword] = useState("")
   const [fieldErrors, setFieldErrors] = useState<{
@@ -71,18 +75,28 @@ export function SignInForm({ nextPath }: { nextPath?: string }) {
     }
 
     if (data?.user?.isBlocked) {
-  router.push("/blocked")
-  return
-}
+      router.push("/blocked")
+      return
+    }
+
     toast.success("Welcome back!")
     setSubmitting(false)
     router.push(nextPath ?? dashboardPathForRole(data?.user?.role))
   }
 
+  const stagger = staggerContainer(0.07, 0.08)
+
   return (
-    <form onSubmit={handleSubmit} className="space-y-4" noValidate>
-      <div className="space-y-1.5">
-        <Label htmlFor="email">Email</Label>
+    <motion.form
+      onSubmit={handleSubmit}
+      variants={reduceMotion ? undefined : stagger}
+      initial={reduceMotion ? false : "hidden"}
+      animate={reduceMotion ? undefined : "show"}
+      className="space-y-4"
+      noValidate
+    >
+      <motion.div variants={reduceMotion ? undefined : fadeUp} className="space-y-1.5">
+        <Label htmlFor="email">Email address</Label>
         <Input
           id="email"
           type="email"
@@ -91,52 +105,82 @@ export function SignInForm({ nextPath }: { nextPath?: string }) {
           placeholder="you@example.com"
           autoComplete="email"
           aria-invalid={Boolean(fieldErrors.email)}
-          className={authControlClassName}
+          className={cn(authControlClassName, "h-11 rounded-xl")}
         />
         {fieldErrors.email ? (
           <p className="text-xs text-destructive">{fieldErrors.email}</p>
         ) : null}
-      </div>
+      </motion.div>
 
-      <PasswordField
-        value={password}
-        onValueChange={setPassword}
-        error={fieldErrors.password}
-        autoComplete="current-password"
-      />
+      <motion.div variants={reduceMotion ? undefined : fadeUp}>
+        <PasswordField
+          value={password}
+          onValueChange={setPassword}
+          error={fieldErrors.password}
+          autoComplete="current-password"
+        />
+      </motion.div>
 
-      <Button
-        type="submit"
-        disabled={submitting}
-        className="h-10 w-full gap-2 bg-[#B76E79] text-[#fffdf8] hover:bg-[#a25a64] focus-visible:border-[#B76E79] focus-visible:ring-[#B76E79]/30 dark:focus-visible:border-champagne-400 dark:focus-visible:ring-champagne-400/30"
+      <motion.div variants={reduceMotion ? undefined : fadeUp}>
+        <motion.div
+          whileHover={reduceMotion || submitting ? undefined : { y: -2 }}
+          whileTap={reduceMotion || submitting ? undefined : { scale: 0.99 }}
+          transition={springSoft}
+        >
+          <Button
+            type="submit"
+            disabled={submitting}
+            className="h-11 w-full gap-2 rounded-xl bg-gradient-to-r from-[#B76E79] to-[#C58970] text-sm font-semibold text-[#fffdf8] shadow-md shadow-rose-900/15 transition-shadow hover:shadow-lg hover:shadow-rose-900/20 focus-visible:border-[#B76E79] focus-visible:ring-[#B76E79]/30 dark:from-champagne-500 dark:to-champagne-400 dark:text-stone-950 dark:focus-visible:border-champagne-400 dark:focus-visible:ring-champagne-400/30"
+          >
+            {submitting ? (
+              <LoaderCircle className="size-4 animate-spin" />
+            ) : (
+              <LogIn className="size-4" />
+            )}
+            {submitting ? "Signing in…" : "Sign In"}
+            {!submitting ? <ArrowRight className="size-4" /> : null}
+          </Button>
+        </motion.div>
+      </motion.div>
+
+      <motion.div
+        variants={reduceMotion ? undefined : fadeUp}
+        className="flex items-center gap-3"
       >
-        {submitting ? (
-          <LoaderCircle className="size-4 animate-spin" />
-        ) : (
-          <LogIn className="size-4" />
-        )}
-        {submitting ? "Signing in…" : "Sign In"}
-      </Button>
-
-      <div className="flex items-center gap-3">
-        <span className="h-px flex-1 bg-rose-200/80 dark:bg-input" />
-        <span className="text-xs text-stone-500 dark:text-muted-foreground">
-          or
+        <span className="h-px flex-1 bg-gradient-to-r from-transparent to-rose-200 dark:to-input" />
+        <span className="text-[11px] font-medium tracking-wider text-stone-400 uppercase dark:text-muted-foreground">
+          or continue with
         </span>
-        <span className="h-px flex-1 bg-rose-200/80 dark:bg-input" />
-      </div>
+        <span className="h-px flex-1 bg-gradient-to-l from-transparent to-rose-200 dark:to-input" />
+      </motion.div>
 
-      <GoogleSignInButton callbackURL="/sign-in" disabled={submitting} />
+      <motion.div variants={reduceMotion ? undefined : fadeUp}>
+        <GoogleSignInButton callbackURL="/sign-in" disabled={submitting} />
+      </motion.div>
 
-      <p className="text-center text-sm text-stone-600 dark:text-muted-foreground">
+      <motion.p
+        variants={reduceMotion ? undefined : fadeUp}
+        className="text-center text-sm text-stone-600 dark:text-muted-foreground"
+      >
         New to WedPlan?{" "}
         <Link
           href="/sign-up"
-          className="font-medium text-[#B76E79] underline-offset-4 hover:underline"
+          className="font-semibold text-[#B76E79] underline-offset-4 hover:underline dark:text-champagne-400"
         >
           Create an account
         </Link>
-      </p>
-    </form>
+      </motion.p>
+
+      <motion.p
+        variants={reduceMotion ? undefined : fadeUp}
+        initial={reduceMotion ? false : { opacity: 0 }}
+        animate={reduceMotion ? undefined : { opacity: 1 }}
+        transition={{ delay: 0.5, duration: 0.5, ease: EASE_OUT }}
+        className="flex items-center justify-center gap-1.5 border-t border-rose-100 pt-4 text-[11px] text-stone-400 dark:border-input dark:text-muted-foreground"
+      >
+        <ShieldCheck className="size-3.5 text-emerald-500" />
+        Your details are encrypted and never shared.
+      </motion.p>
+    </motion.form>
   )
 }

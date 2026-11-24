@@ -1,7 +1,11 @@
+"use client"
+
 import Link from "next/link"
+import { motion, useReducedMotion } from "motion/react"
 import { Mail, MapPin, Phone } from "lucide-react"
 
 import { Logo } from "@/components/Shared/Logo"
+import { EASE_OUT } from "@/lib/motion"
 
 const EXPLORE_LINKS = [
   { href: "/", label: "Home" },
@@ -57,23 +61,54 @@ const SOCIAL_LINKS = [
   { href: "https://youtube.com", label: "YouTube", icon: YoutubeIcon },
 ] as const
 
+const footerColumns = [
+  { title: "Explore", links: EXPLORE_LINKS },
+  {
+    title: "Categories",
+    links: CATEGORY_LINKS.map((name) => ({
+      href: `/browse-services?category=${encodeURIComponent(name)}`,
+      label: name,
+    })),
+  },
+] as const
+
 export function Footer() {
+  const reduceMotion = useReducedMotion()
+
   return (
-    <footer className="relative overflow-hidden border-t border-rose-200/50 bg-[#2C2426] dark:border-border text-stone-200">
+    <footer className="relative overflow-hidden border-t border-rose-200/50 bg-[#2C2426] text-stone-200 dark:border-border">
       {/* Soft background glow accents */}
-      <div
+      <motion.div
         aria-hidden="true"
+        animate={
+          reduceMotion
+            ? undefined
+            : { opacity: [0.5, 0.85, 0.5], scale: [1, 1.08, 1] }
+        }
+        transition={{ duration: 9, repeat: Infinity, ease: "easeInOut" }}
         className="pointer-events-none absolute -top-24 left-1/4 -z-10 h-96 w-96 rounded-full bg-rose-950/30 blur-3xl"
       />
-      <div
+      <motion.div
         aria-hidden="true"
-        className="pointer-events-none absolute bottom-0 right-10 -z-10 h-80 w-80 rounded-full bg-[#B76E79]/10 blur-3xl"
+        animate={
+          reduceMotion
+            ? undefined
+            : { opacity: [0.4, 0.8, 0.4], scale: [1.05, 1, 1.05] }
+        }
+        transition={{ duration: 11, repeat: Infinity, ease: "easeInOut" }}
+        className="pointer-events-none absolute right-10 bottom-0 -z-10 h-80 w-80 rounded-full bg-[#B76E79]/10 blur-3xl"
       />
 
       <div className="mx-auto max-w-7xl px-4 py-14 sm:px-6 lg:px-8 lg:py-20">
         <div className="grid gap-10 md:grid-cols-2 lg:grid-cols-4">
           {/* Brand */}
-          <div className="space-y-4">
+          <motion.div
+            initial={reduceMotion ? false : { opacity: 0, y: 20 }}
+            whileInView={reduceMotion ? undefined : { opacity: 1, y: 0 }}
+            viewport={{ once: true, margin: "-60px" }}
+            transition={{ duration: 0.55, ease: EASE_OUT }}
+            className="space-y-4"
+          >
             <div className="[&_span]:text-stone-100">
               <Logo />
             </div>
@@ -82,61 +117,64 @@ export function Footer() {
               services, and book everything for their big day in one place.
             </p>
             <div className="flex items-center gap-2.5">
-              {SOCIAL_LINKS.map((social) => (
-                <a
+              {SOCIAL_LINKS.map((social, index) => (
+                <motion.a
                   key={social.label}
                   href={social.href}
                   target="_blank"
                   rel="noopener noreferrer"
                   aria-label={social.label}
-                  className="flex size-9 items-center justify-center rounded-full border border-stone-800 bg-stone-900/60 text-stone-300 shadow-2xs backdrop-blur-sm transition-all duration-300 hover:border-[#B76E79] hover:bg-[#B76E79] hover:text-white"
+                  initial={reduceMotion ? false : { opacity: 0, scale: 0.8 }}
+                  whileInView={reduceMotion ? undefined : { opacity: 1, scale: 1 }}
+                  viewport={{ once: true }}
+                  transition={{ delay: index * 0.06, duration: 0.35, ease: EASE_OUT }}
+                  whileHover={reduceMotion ? undefined : { y: -3, scale: 1.05 }}
+                  className="flex size-9 items-center justify-center rounded-full border border-stone-800 bg-stone-900/60 text-stone-300 shadow-2xs backdrop-blur-sm transition-colors duration-300 hover:border-[#B76E79] hover:bg-[#B76E79] hover:text-white"
                 >
                   <social.icon className="size-4" />
-                </a>
+                </motion.a>
               ))}
             </div>
-          </div>
+          </motion.div>
 
-          {/* Explore */}
-          <div>
-            <h3 className="font-heading text-sm font-semibold tracking-wider text-stone-100 uppercase">
-              Explore
-            </h3>
-            <ul className="mt-4 space-y-2.5">
-              {EXPLORE_LINKS.map((link) => (
-                <li key={link.href}>
-                  <Link
-                    href={link.href}
-                    className="text-sm text-stone-400 transition-colors hover:text-[#C58970]"
-                  >
-                    {link.label}
-                  </Link>
-                </li>
-              ))}
-            </ul>
-          </div>
-
-          {/* Categories */}
-          <div>
-            <h3 className="font-heading text-sm font-semibold tracking-wider text-stone-100 uppercase">
-              Categories
-            </h3>
-            <ul className="mt-4 space-y-2.5">
-              {CATEGORY_LINKS.map((category) => (
-                <li key={category}>
-                  <Link
-                    href={`/browse-services?category=${encodeURIComponent(category)}`}
-                    className="text-sm text-stone-400 transition-colors hover:text-[#C58970]"
-                  >
-                    {category}
-                  </Link>
-                </li>
-              ))}
-            </ul>
-          </div>
+          {footerColumns.map((column, columnIndex) => (
+            <motion.div
+              key={column.title}
+              initial={reduceMotion ? false : { opacity: 0, y: 20 }}
+              whileInView={reduceMotion ? undefined : { opacity: 1, y: 0 }}
+              viewport={{ once: true, margin: "-60px" }}
+              transition={{
+                duration: 0.55,
+                delay: 0.08 * (columnIndex + 1),
+                ease: EASE_OUT,
+              }}
+            >
+              <h3 className="font-heading text-sm font-semibold tracking-wider text-stone-100 uppercase">
+                {column.title}
+              </h3>
+              <ul className="mt-4 space-y-2.5">
+                {column.links.map((link) => (
+                  <li key={link.href}>
+                    <Link
+                      href={link.href}
+                      className="group inline-flex items-center gap-1.5 text-sm text-stone-400 transition-colors hover:text-[#C58970]"
+                    >
+                      <span className="h-px w-0 bg-[#C58970] transition-all duration-300 group-hover:w-3" />
+                      {link.label}
+                    </Link>
+                  </li>
+                ))}
+              </ul>
+            </motion.div>
+          ))}
 
           {/* Contact */}
-          <div>
+          <motion.div
+            initial={reduceMotion ? false : { opacity: 0, y: 20 }}
+            whileInView={reduceMotion ? undefined : { opacity: 1, y: 0 }}
+            viewport={{ once: true, margin: "-60px" }}
+            transition={{ duration: 0.55, delay: 0.24, ease: EASE_OUT }}
+          >
             <h3 className="font-heading text-sm font-semibold tracking-wider text-stone-100 uppercase">
               Contact
             </h3>
@@ -164,7 +202,7 @@ export function Footer() {
                 </a>
               </li>
             </ul>
-          </div>
+          </motion.div>
         </div>
 
         <div className="mt-14 flex flex-col items-center justify-between gap-3 border-t border-stone-800 pt-6 text-center sm:flex-row sm:text-left">
@@ -172,10 +210,7 @@ export function Footer() {
             © {new Date().getFullYear()} WedPlan. All rights reserved.
           </p>
           <p className="flex items-center gap-1.5 text-xs text-stone-500">
-            <Link
-              href="/"
-              className="transition-colors hover:text-[#C58970]"
-            >
+            <Link href="/" className="transition-colors hover:text-[#C58970]">
               WedPlan
             </Link>
             — craft your celebration

@@ -1,3 +1,8 @@
+"use client"
+
+import { motion, useReducedMotion } from "motion/react"
+
+import { EASE_OUT } from "@/lib/motion"
 import { cn } from "@/lib/utils"
 
 type SectionHeadingProps = {
@@ -15,8 +20,14 @@ export function SectionHeading({
   align = "center",
   className,
 }: SectionHeadingProps) {
+  const reduceMotion = useReducedMotion()
+
   return (
-    <div
+    <motion.div
+      initial={reduceMotion ? false : { opacity: 0, y: 18 }}
+      whileInView={reduceMotion ? undefined : { opacity: 1, y: 0 }}
+      viewport={{ once: true, margin: "-80px" }}
+      transition={{ duration: 0.55, ease: EASE_OUT }}
       className={cn(
         "max-w-2xl",
         align === "center" ? "mx-auto text-center" : "text-left",
@@ -24,7 +35,11 @@ export function SectionHeading({
       )}
     >
       {eyebrow ? (
-        <p className="text-xs font-semibold tracking-[0.2em] text-[#B76E79] uppercase">
+        <p className="inline-flex items-center gap-2 text-xs font-semibold tracking-[0.2em] text-[#B76E79] uppercase">
+          <span
+            aria-hidden="true"
+            className="h-px w-6 bg-gradient-to-r from-transparent to-[#B76E79]"
+          />
           {eyebrow}
         </p>
       ) : null}
@@ -36,6 +51,6 @@ export function SectionHeading({
           {description}
         </p>
       ) : null}
-    </div>
+    </motion.div>
   )
 }

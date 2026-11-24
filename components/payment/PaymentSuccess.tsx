@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react"
 import Link from "next/link"
+import { AnimatePresence, motion, useReducedMotion } from "motion/react"
 import {
   AlertCircle,
   ArrowRight,
@@ -26,6 +27,7 @@ import { useSession } from "@/lib/auth-client"
 import { authFetch } from "@/lib/auth-fetch"
 import { API_ENDPOINTS } from "@/lib/constants"
 import { formatDate } from "@/lib/format"
+import { EASE_OUT } from "@/lib/motion"
 import type { Transaction } from "@/lib/types"
 import { cn } from "@/lib/utils"
 
@@ -81,6 +83,7 @@ function ReceiptRow({
 
 export function PaymentSuccess({ sessionId }: { sessionId: string | null }) {
   const { refetch } = useSession()
+  const reduceMotion = useReducedMotion()
 
   const [status, setStatus] = useState<ConfirmationStatus>(
     sessionId ? "checking" : "missing"
@@ -199,16 +202,27 @@ export function PaymentSuccess({ sessionId }: { sessionId: string | null }) {
 
   return (
     <div className="relative overflow-hidden bg-[#FDFBF7] px-4 py-10 sm:px-6 sm:py-16 dark:bg-background">
-      <div
+      <motion.div
         aria-hidden="true"
+        animate={
+          reduceMotion
+            ? undefined
+            : { opacity: [0.4, 0.75, 0.4], scale: [1, 1.1, 1] }
+        }
+        transition={{ duration: 9, repeat: Infinity, ease: "easeInOut" }}
         className="pointer-events-none absolute -top-24 left-1/2 size-72 -translate-x-1/2 rounded-full bg-rose-200/40 blur-3xl dark:bg-rose-500/10"
       />
-      <div className="relative mx-auto w-full max-w-2xl">
+      <motion.div
+        initial={reduceMotion ? false : { opacity: 0, y: 24, scale: 0.985 }}
+        animate={reduceMotion ? undefined : { opacity: 1, y: 0, scale: 1 }}
+        transition={{ duration: 0.6, ease: EASE_OUT }}
+        className="relative mx-auto w-full max-w-2xl"
+      >
         <div className="overflow-hidden rounded-3xl border border-rose-200/80 bg-white shadow-xl shadow-rose-950/5 dark:border-input dark:bg-card">
           {/* Status banner */}
           <div
             className={cn(
-              "relative overflow-hidden px-6 py-8 text-center text-white sm:px-8",
+              "relative overflow-hidden px-6 py-8 text-center text-white transition-colors duration-500 sm:px-8",
               status === "confirmed"
                 ? "bg-gradient-to-br from-[#1f3d31] via-[#2f5c47] to-[#4c7a5f]"
                 : status === "pending" || status === "checking"
@@ -225,23 +239,42 @@ export function PaymentSuccess({ sessionId }: { sessionId: string | null }) {
               className="pointer-events-none absolute -bottom-16 -left-10 size-44 rounded-full bg-amber-200/15 blur-3xl"
             />
 
-            <div className="relative mx-auto flex size-16 items-center justify-center rounded-full border border-white/25 bg-white/15 backdrop-blur-md">
-              {status === "confirmed" ? (
-                <CheckCircle2 className="size-8" />
-              ) : status === "checking" ? (
-                <LoaderCircle className="size-8 animate-spin" />
-              ) : status === "pending" ? (
-                <Clock className="size-8" />
-              ) : (
-                <AlertCircle className="size-8" />
-              )}
-            </div>
+            <AnimatePresence mode="wait" initial={false}>
+              <motion.div
+                key={status}
+                initial={reduceMotion ? false : { scale: 0.7, opacity: 0, rotate: -8 }}
+                animate={reduceMotion ? undefined : { scale: 1, opacity: 1, rotate: 0 }}
+                exit={reduceMotion ? undefined : { scale: 0.85, opacity: 0 }}
+                transition={{ duration: 0.4, ease: EASE_OUT }}
+                className="relative mx-auto flex size-16 items-center justify-center rounded-full border border-white/25 bg-white/15 backdrop-blur-md"
+              >
+                {status === "confirmed" ? (
+                  <CheckCircle2 className="size-8" />
+                ) : status === "checking" ? (
+                  <LoaderCircle className="size-8 animate-spin" />
+                ) : status === "pending" ? (
+                  <Clock className="size-8" />
+                ) : (
+                  <AlertCircle className="size-8" />
+                )}
+              </motion.div>
+            </AnimatePresence>
 
-            <p className="relative mt-4 flex items-center justify-center gap-2 text-[10px] font-semibold tracking-[0.24em] uppercase opacity-80">
+            <motion.p
+              initial={reduceMotion ? false : { opacity: 0, y: 10 }}
+              animate={reduceMotion ? undefined : { opacity: 1, y: 0 }}
+              transition={{ delay: 0.15, duration: 0.5, ease: EASE_OUT }}
+              className="relative mt-4 flex items-center justify-center gap-2 text-[10px] font-semibold tracking-[0.24em] uppercase opacity-80"
+            >
               <Sparkles className="size-3" />
               WedPlan Premium
-            </p>
-            <h1 className="relative mt-1.5 font-heading text-3xl font-semibold tracking-tight sm:text-4xl">
+            </motion.p>
+            <motion.h1
+              initial={reduceMotion ? false : { opacity: 0, y: 12 }}
+              animate={reduceMotion ? undefined : { opacity: 1, y: 0 }}
+              transition={{ delay: 0.2, duration: 0.55, ease: EASE_OUT }}
+              className="relative mt-1.5 font-heading text-3xl font-semibold tracking-tight sm:text-4xl"
+            >
               {status === "confirmed"
                 ? "Payment confirmed"
                 : status === "checking"
@@ -251,8 +284,13 @@ export function PaymentSuccess({ sessionId }: { sessionId: string | null }) {
                     : status === "missing"
                       ? "Checkout session missing"
                       : "Confirmation unavailable"}
-            </h1>
-            <p className="relative mx-auto mt-2 max-w-md text-sm leading-relaxed opacity-80">
+            </motion.h1>
+            <motion.p
+              initial={reduceMotion ? false : { opacity: 0, y: 12 }}
+              animate={reduceMotion ? undefined : { opacity: 1, y: 0 }}
+              transition={{ delay: 0.26, duration: 0.55, ease: EASE_OUT }}
+              className="relative mx-auto mt-2 max-w-md text-sm leading-relaxed opacity-80"
+            >
               {status === "confirmed"
                 ? "Welcome to Premium. Your vendor account has been upgraded and your receipt is saved."
                 : status === "checking"
@@ -262,10 +300,18 @@ export function PaymentSuccess({ sessionId }: { sessionId: string | null }) {
                     : status === "missing"
                       ? "We could not find a Stripe session in this link. Open your subscription page to check your plan."
                       : errorMessage}
-            </p>
+            </motion.p>
           </div>
 
-          <div className="p-6 sm:p-8">
+          <AnimatePresence mode="wait" initial={false}>
+            <motion.div
+              key={status}
+              initial={reduceMotion ? false : { opacity: 0, y: 12 }}
+              animate={reduceMotion ? undefined : { opacity: 1, y: 0 }}
+              exit={reduceMotion ? undefined : { opacity: 0, y: -8 }}
+              transition={{ duration: 0.35, ease: EASE_OUT }}
+              className="p-6 sm:p-8"
+            >
             {status === "checking" ? (
               <div className="space-y-3">
                 <Skeleton className="h-14 w-full rounded-xl bg-rose-100/70 dark:bg-input/30" />
@@ -454,14 +500,15 @@ export function PaymentSuccess({ sessionId }: { sessionId: string | null }) {
                 Unlimited services
               </span>
             </div>
-          </div>
+            </motion.div>
+          </AnimatePresence>
         </div>
 
         <p className="mt-4 text-center text-xs text-stone-500 dark:text-muted-foreground">
           Need help with a payment? Contact WedPlan support with your receipt
           reference.
         </p>
-      </div>
+      </motion.div>
     </div>
   )
 }
